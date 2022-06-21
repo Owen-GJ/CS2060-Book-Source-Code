@@ -6,6 +6,57 @@
 int main( void )
 {
    printf( "Welcome to C!\n" );
+
+   //declaring variables
+   unsigned int length = 0;
+   unsigned int width = 0;
+   unsigned int area = 0;
+   unsigned int enteredNumber = 0;
+   unsigned int inputVal = 0;
+   unsigned int scannedVar = 0;
+   unsigned int divisionResult = 0;
+
+   //obtaining length
+   puts("Enter the length");
+
+   while (inputVal == 0) {
+	   scannedVar = scanf("%u", enteredNumber);//collecting input
+
+	   while (getchar() != '\n');//clearing buffer
+
+	   if (scannedVar == 1) {//assigning to variable if scanf scanned something
+		   length = enteredNumber;
+		   inputVal = 1;
+	   }
+	   else {
+		   puts("Input is either negative or invalid, try again");
+	   }
+   }
+
+
+   //obtaining width
+   puts("Enter the width");
+
+   scannedVar = scanf("%u", &enteredNumber);//collecting input
+
+   while (getchar() != '\n');//clearing buffer
+
+   if (scannedVar == 1) {//assigning to variable if scanf scanned something
+	   width = enteredNumber;
+
+   }
+
+
+   //calculate area
+   area = length * width;
+
+   printf("Length: %u\nWidth: %u\nArea: %u\n", length, width, area);
+
+   divisionResult = length / width;
+
+   printf("Division Result: %u", divisionResult);
+
+   return 0;
 } // end function main 
 
 
