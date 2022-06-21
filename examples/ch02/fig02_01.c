@@ -20,7 +20,7 @@ int main( void )
    puts("Enter the length");
 
    while (inputVal == 0) {
-	   scannedVar = scanf("%u", enteredNumber);//collecting input
+	   scannedVar = scanf("%u", &enteredNumber);//collecting input
 
 	   while (getchar() != '\n');//clearing buffer
 
