@@ -9,14 +9,37 @@ int main( void )
    unsigned int passes = 0; // number of passes   
    unsigned int failures = 0; // number of failures 
    unsigned int student = 1; // student counter    
-   int result; // one exam result 
+   int result = 0; // one exam result 
 
    // process 10 students using counter-controlled loop 
    while ( student <= 10 ) {
 
-      // prompt user for input and obtain value from user 
-      printf( "%s", "Enter result ( 1=pass,2=fail ): " );
-      scanf( "%d", &result );
+
+
+
+       do {
+           // prompt user for input and obtain value from user 
+           printf( "%s", "Enter result ( 1=pass,2=fail ): " );
+           int scannedVar = scanf( "%d", &result );
+
+           while ((getchar()) != '\n');
+
+           if (scannedVar == 1)
+           {
+               if(result != 1 && result != 2)
+                   puts("Invalid input, try agian");
+           }
+           else{
+               puts("Invalid input, input not a number, try again");
+           }
+       } while (result != 1 && result != 2);
+
+      
+
+
+
+
+
 
       // if result 1, increment passes 
       if ( result == 1 ) {     
