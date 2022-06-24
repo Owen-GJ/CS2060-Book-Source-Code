@@ -152,7 +152,7 @@ void writeTo2DArray(int array[ROWS][COLUMNS])
 }
 
 
-
+//prints 2dArray
 void print2DArray(int array[ROWS][COLUMNS])
 {
     for (size_t row = 0; row < ROWS; row++)
