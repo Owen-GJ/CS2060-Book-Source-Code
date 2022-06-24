@@ -2,10 +2,19 @@
 // Passing arrays and individual array elements to functions.
 #include <stdio.h>
 #define SIZE 5
+#define ROWS 3
+#define COLUMNS 4
+
 
 // function prototypes
 void modifyArray(int b[], size_t size);
 void modifyElement(int e);               
+void printArray(const int c[], size_t size);
+
+
+
+
+
 
 // function main begins program execution
 int main(void)
@@ -38,6 +47,28 @@ int main(void)
 
    // output value of a[3]
    printf("The value of a[3] is %d\n", a[3]);
+
+   //adding line space
+   puts("");
+
+
+
+   //print values of array a
+   printArray(a, SIZE);
+
+
+   //creating a multidimensional array with rows and columns
+   int multi[3][4];
+
+   for (size_t row = 0; row < ROWS; row++)
+   {
+       for (size_t column = 0; column < COLUMNS; column++)
+       {
+           multi[row][column] = 0;
+       }
+   }
+
+
 }
 
 // in function modifyArray, "b" points to the original array "a" 
@@ -56,7 +87,20 @@ void modifyElement(int e)
 {                                                                 
    // multiply parameter by 2                                  
    printf("Value in modifyElement is %d\n", e *= 2);            
-} 
+}
+
+
+//prints all the elements in a 1 dimensional array
+void printArray(const int c[], size_t size)
+{
+    printf("%s" , "Elements in array are: ");
+
+    for (size_t i = 0; i < size; ++i) {
+
+        printf("%d ", c[i]);
+
+    }
+}
                           
 
 
