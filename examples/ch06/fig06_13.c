@@ -10,8 +10,8 @@
 void modifyArray(int b[], size_t size);
 void modifyElement(int e);               
 void printArray(const int c[], size_t size);
-void writeTo2DArray(int[ROWS][COLUMNS], size_t rowSize, size_t columnSize);
-void print2DArray(int[ROWS][COLUMNS], size_t rowSize, size_t columnSize);
+void writeTo2DArray(int[ROWS][COLUMNS]);
+void print2DArray(int[ROWS][COLUMNS]);
 
 
 
@@ -72,8 +72,14 @@ int main(void)
    //spacer
    puts("\n");
 
-   writeTo2DArray(multi, ROWS, COLUMNS);
 
+   writeTo2DArray(multi);
+
+   //spacer
+   puts("\n");
+
+
+   print2DArray(multi);
 }
 
 // in function modifyArray, "b" points to the original array "a" 
@@ -110,7 +116,7 @@ void printArray(const int c[], size_t size)
 
 
 //allows user to input values into the elements of a 2D array
-void writeTo2DArray(int array[ROWS][COLUMNS], size_t rowSize, size_t columnSize)
+void writeTo2DArray(int array[ROWS][COLUMNS])
 {
     for (size_t row = 0; row < ROWS; row++) 
     {
@@ -139,6 +145,22 @@ void writeTo2DArray(int array[ROWS][COLUMNS], size_t rowSize, size_t columnSize)
             } while (scannedVar == 0);
 
 
+
+
+        }
+    }
+}
+
+
+
+void print2DArray(int array[ROWS][COLUMNS])
+{
+    for (size_t row = 0; row < ROWS; row++)
+    {
+        for (size_t column = 0; column < COLUMNS; column++)
+        {
+
+            printf("The value for index[%lli][%lli] is: %d\n", row, column, array[row][column]);
 
 
         }
