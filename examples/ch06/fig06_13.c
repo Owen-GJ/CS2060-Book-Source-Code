@@ -10,7 +10,8 @@
 void modifyArray(int b[], size_t size);
 void modifyElement(int e);               
 void printArray(const int c[], size_t size);
-
+void writeTo2DArray(int[ROWS][COLUMNS], size_t rowSize, size_t columnSize);
+void print2DArray(int[ROWS][COLUMNS], size_t rowSize, size_t columnSize);
 
 
 
@@ -68,6 +69,10 @@ int main(void)
        }
    }
 
+   //spacer
+   puts("\n");
+
+   writeTo2DArray(multi, ROWS, COLUMNS);
 
 }
 
@@ -99,6 +104,44 @@ void printArray(const int c[], size_t size)
 
         printf("%d ", c[i]);
 
+    }
+}
+
+
+
+//allows user to input values into the elements of a 2D array
+void writeTo2DArray(int array[ROWS][COLUMNS], size_t rowSize, size_t columnSize)
+{
+    for (size_t row = 0; row < ROWS; row++) 
+    {
+        for (size_t column = 0; column < COLUMNS; column++) 
+        {
+            
+            printf("Enter the value for array[%lli][%lli]: ", row, column);
+
+            //scannedVar for input validation and do while
+            int scannedVar = 0;
+            do 
+            {
+                //input
+                scannedVar = scanf("%d", &array[row][column]);
+
+                while (getchar() != '\n');
+
+
+                //check
+                if (scannedVar != 1)
+                {
+                    puts("Input not an integer, try again.");
+                }
+
+
+            } while (scannedVar == 0);
+
+
+
+
+        }
     }
 }
                           
