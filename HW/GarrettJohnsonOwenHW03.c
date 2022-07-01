@@ -24,7 +24,7 @@ int main(void){
 	double input = 0;
 
 	//other variables
-	int cars = 0;
+	unsigned int cars = 0;
 	double fee = 0;
 	double totalHours = 0;
 	double totalFee = 0;
@@ -62,11 +62,20 @@ int main(void){
 
 	} while (input != -1);
 
-	//display totals
-	//header
-	printf("Totals for the day\n%s\t%s\t%s\n", "Cars", "Hours", "Charge");
-	displayGarageFee(cars, totalHours, totalFee);
 
+	//if no cars came through
+	if (cars == 0) {
+		puts("There were no cars parked today.");
+	}
+
+
+	//cars came through
+	else {
+		//display totals
+		//header
+		printf("Totals for the day\n%s\t%s\t%s\n", "Cars", "Hours", "Charge");
+		displayGarageFee(cars, totalHours, totalFee);
+	}
 }
 
 
@@ -75,7 +84,7 @@ int main(void){
 double validateInput(int min, int max) {
 
 	double input = 0;
-	unsigned int scannedVar = 0;
+	int scannedVar = 0;
 	
 	do {
 		
