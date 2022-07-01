@@ -14,7 +14,8 @@ double validateInput(int min, int max);
 void displayGarageFee(int car, double hours, double fee);
 double calculateFee(double input);
 
-
+//This program will take input from the user as hours and then calculate the parking fee for those hours, the progrom will then prompt
+//the user for another input and continue the cycle until -1 is input, at which time the program will total the cars, hours, and collected fees.
 
 
 // function main begins program execution
@@ -29,6 +30,7 @@ int main(void){
 	double totalHours = 0;
 	double totalFee = 0;
 
+	//loop for obtaining multiple hours
 	do {
 		//greeting and retrieving input
 		puts("Enter the number of hours the car was parked or enter -1 to quit.");
@@ -41,16 +43,13 @@ int main(void){
 			cars++;
 			totalHours += input;
 			fee = calculateFee(input);
-
-			//checking if fee is greater than MAX_PRICE and setting to max price
-			if (fee > MAX_PRICE) {
-				fee = MAX_PRICE;
-			}
 			totalFee += fee;
 
 
 			//header for display table
 			printf("%s\t%s\t%s\n", "Car", "Hours", "Charge");
+
+			//calling for body of table
 			displayGarageFee(cars, input, fee);
 			puts("");
 
@@ -95,7 +94,7 @@ double validateInput(int min, int max) {
 
 
 		//making sure the loop runs again if input is out of bounds
-		if ((input != -1) && (input <= min || max < input)) {
+		if ((input != -1) && (input <= min || max < input) && scannedVar == 1) {
 			scannedVar = 0;
 
 			printf("Input is not between %d and %d\n", min, max);
@@ -147,6 +146,10 @@ double calculateFee(double input) {
 	//fee for decimal
 	else if (floored != input) {
 		fee = (((floored + 1) - PRICING_MIN_HOUR) * PRICE_PER_HOUR) + MIN_PRICE;
+	}
+
+	if (fee > MAX_PRICE) {
+		fee = MAX_PRICE;
 	}
 
 
