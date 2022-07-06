@@ -3,52 +3,102 @@
 #include <stdio.h>
 
 // prototypes
-int function1(int a);
-int function2(int b);
-int function3(int c);
+double addition(double a, double b);
+double subtraction(double a, double b);
+double multiplication(double a, double b);
+double division(double a, double b);
 
 int main(void)
 {
    // initialize array of 3 pointers to functions that each take an
    // int argument and return void                              
-   int (*f[3])(int) = {function1, function2, function3};    
+   double (*f[4])(double,double) = {addition, subtraction, multiplication, division};    
 
-   printf("%s", "Enter a number between 0 and 2, 3 to end: ");
+   printf("%s", "Enter a number between 0 and 4: \n"
+       "0: Addition\n1: Subtraction\n2: Multiplication\n3: Division\n4: End program\n");
    size_t choice; // variable to hold user's choice
    scanf("%llu", &choice);
+   
+   //i realize we aren't worried too much about security practices, but this is to make things easier
+   while (getchar() != '\n');
 
    //variable to catch the return of function
-   int catch = 0;
+   double catch = 0;
 
    // process user's choice
-   while (choice >= 0 && choice < 3) {
+   while (choice >= 0 && choice < 4) {
 
-      // invoke function at location choice in array f and pass
-      // choice as an argument                              
-      catch = (*f[choice])(choice);                                
+       //variables to hold users calculation inputs
+       double first;
+       double second;
 
-      printf("%s", "Enter a number between 0 and 2, 3 to end: ");
+       switch (choice) {
+       case 0: puts("Addition selected"); break;
+       case 1: puts("Subtraction selected"); break;
+       case 2: puts("Multiplication  selected"); break;
+       case 3: puts("Division selected"); break;
+       }
+
+
+       puts("Enter the two inputs for the calculation");
+
+       printf("%s", "First input: ");
+       scanf("%lf", &first);
+       while (getchar() != '\n');
+       puts("");
+
+       printf("%s", "Second input: ");
+       scanf("%lf", &second);
+       while (getchar() != '\n');
+       puts("");
+
+      catch = (*f[choice])(first, second);                                
+
+      printf("The return value is %.2lf\n\n", catch);
+
+      printf("%s", "Enter a number between 0 and 4: \n"
+          "0: Addition\n1: Subtraction\n2: Multiplication\n3: Division\n4: End program\n");
+
       scanf("%llu", &choice);
    } 
 
-   printf("The return value is %d", catch);
 
    puts("Program execution completed.");
 } 
 
-int function1(int a)
+//returns the sum of a + b
+double addition(double a, double b)
 {
-    return a;
+    double sum = a + b;
+
+    return sum;
 }
 
-int function2(int b)
+//returns difference of a - b
+double subtraction(double a, double b)
 {
-   return b;
+    double difference = a - b;
+
+   return difference;
 }
 
-int function3(int c)
+
+//returns product of a * b
+double multiplication(double a, double b)
 {
-    return c;
+    double product = a * b;
+
+    return product;
+}
+
+
+//returns quotient of a / b
+double division(double a, double b) {
+
+    double quotient = a / b;
+
+    return quotient;
+
 }
 
 
