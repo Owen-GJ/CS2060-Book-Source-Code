@@ -9,8 +9,8 @@
 
 // prototype
 void reviewChar(void);
-void exploreStringCharArray(void);
-void testStringOverflow(void);
+//void exploreStringCharArray(void);
+//void testStringOverflow(void);
 void arrayPointerString(void);
 
 
@@ -18,8 +18,8 @@ int main(void)
 {
 
 	//reviewChar();
-	exploreStringCharArray();
-	//arrayPointerString(); 
+	//exploreStringCharArray();
+	arrayPointerString(); 
 
 	return 0;
 }
@@ -52,16 +52,16 @@ void exploreStringCharArray(void)
 	printf("*string3Ptr = %s\n\n", string3Ptr);
 
 	/*comment this function out after you see what happens and run again*/
-	puts("See what happens when the next function is called. Then comment this function.");
-	testStringOverflow();
+	//puts("See what happens when the next function is called. Then comment this function.");
+	//testStringOverflow();
 
 	/*Comment the next  lines of code after you see what happens here and with the next scanf */
-	puts("See what happens when the following overslow is scanned and what happens with next scanf");
+	/*puts("See what happens when the following overslow is scanned and what happens with next scanf");
 	puts("Then comment out the following 4 lines of code");
 	printf("%s", "Enter a string more than 9 into string3: ");
 	scanf("%9s", string3);
 	printf("string3[] = %s\n", string3);
-	printf("*string3Ptr = %s\n\n", string3Ptr);
+	printf("*string3Ptr = %s\n\n", string3Ptr);*/
 	
 	
 	printf("%s", "Enter a string  into  string3Ptr that is 9 char or less: ");
@@ -89,14 +89,14 @@ void exploreStringCharArray(void)
 
 }
 
-void testStringOverflow(void)
-{
-	char string[10] = { " " };
-
-	printf("%s", "Enter a string longer than 9 characters");
-	scanf("%s", string);
-
-}
+//void testStringOverflow(void)
+//{
+//	char string[10] = { " " };
+//
+//	printf("%s", "Enter a string longer than 9 characters");
+//	scanf("%s", string);
+//
+//}
 
 //Understanding Array of pointers to array of characters
 void arrayPointerString(void)
