@@ -17,7 +17,7 @@ int main(void) {
 	
 	
 	printf ("In main before cubePass1  numberMain = %d\n", numberMain);//prints out value of numberMain
-	printf("&numberMain = %p\n", *numberMain);//prints out memory address of numberMain
+	printf("&numberMain = %p\n", &numberMain);//prints out memory address of numberMain
 	result = cubePass1(numberMain);
 
 
@@ -57,7 +57,7 @@ int cubePass2 (int * numberPtr)
 	int cube = 0;
 	puts ("\nIn cubePass2");
 
-	printf("numberPtr = %p\n", numberPtr);//memory location of the variabel that was passed into the function
+	printf("numberPtr = %p\n", numberPtr);//memory location of the variable that was passed into the function
 	printf ("*numberPtr = %d\n", *numberPtr);//value of the variable passed into the function
 
 	printf("&numberPtr = %p\n", &numberPtr);//memory location of the pointer pointing to the variable passed into the function
