@@ -11,19 +11,20 @@ Due 7/14
 
 
 
-#define arrayLength 80
+#define ARRAY_LENGTH 80
 #define CORRECT_PASSCODE "$3cr3t!"
+#define SIZE_ARRAY_LENGTH 4
 
 void getString(char* inputStringPtr);
 bool valString(char* inputStringPtr);
-
+char valSize(char sizeSelect, const char *sizeArray);
 
 
 int main(void) {
-	static const char* SIZE[4] = ("(s)mall" "(m)edium" "(l)arge" "(x)tra-large" );
+
 
 	//getting passcode and validating it
-	char inPasscode[arrayLength];
+	char inPasscode[ARRAY_LENGTH];
 	puts("Enter passcode");
 	getString(inPasscode);
 	bool correctPasscode = valString(inPasscode);
@@ -36,7 +37,17 @@ int main(void) {
 		puts("Passcode incorrect");
 	}
 
+	//getting shirt size
+	static const char* SHIRT_SIZE[SIZE_ARRAY_LENGTH] = { "(s)mall" "(m)edium" "(l)arge" "(x)tra-large" };
 
+	printf("c", SHIRT_SIZE[0][1]);
+
+
+	printf("Select your shirt size by entering the character in parentheses: %s %s %s %s", SHIRT_SIZE[0], SHIRT_SIZE[1], SHIRT_SIZE[2], SHIRT_SIZE[3]);
+	char selectSize = getchar();
+	selectSize = valSize(selectSize, SHIRT_SIZE);
+
+	printf("%c", selectSize);
 }
 
 
@@ -44,7 +55,7 @@ int main(void) {
 void getString(char* inputStringPtr) {
 
 	//get input
-	fgets(inputStringPtr, arrayLength, stdin);
+	fgets(inputStringPtr, ARRAY_LENGTH, stdin);
 	size_t length;
 
 	//change new line character '\n' to null character '\0' if '\n' exists
@@ -58,6 +69,7 @@ void getString(char* inputStringPtr) {
 }//getSTring
 
 
+//validates if a string is equal to a password
 bool valString(char* inputStringPtr) {
 
 	//compare input to passcode
@@ -71,8 +83,23 @@ bool valString(char* inputStringPtr) {
 	}
 
 	return match;
+}//valString
+
+
+//validates if a char was entered that matches a size
+char valSize(char sizeSelect, const char *stringArray) {
+	
+
+
+	for (size_t i = 0; i < SIZE_ARRAY_LENGTH; i++) {
+		if (sizeSelect == *((stringArray + i))+1) {
+			return sizeSelect;
+		}
+
+		else if (i == SIZE_ARRAY_LENGTH - 1)
+		{
+			return EOF;
+		}
+	}
+
 }
-
-
-
-
