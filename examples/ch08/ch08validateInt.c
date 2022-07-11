@@ -15,7 +15,9 @@
 
 #define LENGTH 13
 
-void  exploreValidateInt(const char* buff);
+//added arguments to prototype so that it can accept a pointer to a passed in int. It works similar to scanf as that i can modify
+//a reference passed in. This allows the function to return a bool and change a value in main.
+bool exploreValidateInt(const char* buff, int *modifyInt);
 bool validateInt(char* buff, int* const validInt);
 void printLimits();
 
@@ -31,12 +33,13 @@ int main(void)
 	puts("\nEnter an integer");
 	fgets(inputStr, LENGTH, stdin);
 
-	for (unsigned int counter = 1; counter < 6; counter++)
-	{
-		exploreValidateInt(inputStr);
+	//commented out for loop because it wouldn't change stuff.
+	//for (unsigned int counter = 1; counter < 6; counter++)
+	//{
+		isValid = exploreValidateInt(inputStr, &integerValue);
+		printf("integerValue is now: %d", integerValue);
 
-	}
-
+	//}
 
 	
 }
@@ -65,8 +68,14 @@ void printLimits()
 }
 
 
-void  exploreValidateInt(const char* buff)
+bool  exploreValidateInt(const char* buff, int *modifyInt)
 {
+	//boolean added to say if it is valid
+	bool isValid = false;
+
+	//used in first if else
+	char* compareToNull = "\n";
+
 	char* end;
 	errno = 0;
 	int validInt = 0;
@@ -74,7 +83,9 @@ void  exploreValidateInt(const char* buff)
 	if (end == buff) {
 		fprintf(stderr, "%s: not a decimal number\n", buff);
 	}
-	else if ('\0' != *end) {
+
+	//comparing string to another string needs function comparison so I changed it
+	else if (strcmp(compareToNull, end) != 0) {
 		fprintf(stderr, "%s: extra characters at end of input: %s\n", buff, end);
 	}
 	else if ((LONG_MIN == intTest || LONG_MAX == intTest) && ERANGE == errno) {
@@ -89,5 +100,13 @@ void  exploreValidateInt(const char* buff)
 	else {
 		validInt = (int)intTest;
 		printf("%ld is integer value ", intTest);
+		//chang isValid to true
+		isValid = true;
+
+		//edit referenced memory to inputed integer.
+		*modifyInt = (int) intTest;
+
 	}
+
+	return isValid;
 }
