@@ -20,8 +20,7 @@ bool valString(char* inputStringPtr);
 
 
 int main(void) {
-	const char* size = {"(s)mall", "(m)edium", "(l)arge", "(x)tra - large"};
-
+	static const char* SIZE[4] = ("(s)mall" "(m)edium" "(l)arge" "(x)tra-large" );
 
 	//getting passcode and validating it
 	char inPasscode[arrayLength];
@@ -37,6 +36,7 @@ int main(void) {
 		puts("Passcode incorrect");
 	}
 
+
 }
 
 
@@ -45,7 +45,7 @@ void getString(char* inputStringPtr) {
 
 	//get input
 	fgets(inputStringPtr, arrayLength, stdin);
-	int length;
+	size_t length;
 
 	//change new line character '\n' to null character '\0' if '\n' exists
 	length = strlen(inputStringPtr);
@@ -55,8 +55,6 @@ void getString(char* inputStringPtr) {
 	if (check == '\n') {
 		inputStringPtr[length - 1] = '\0';
 	}
-
-
 }//getSTring
 
 
