@@ -8,21 +8,27 @@ Due 7/14
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
-
-
+#include <ctype.h>
+#include <stdlib.h>
+#include <float.h>
+#include <errno.h>
 
 #define ARRAY_LENGTH 80
 #define CORRECT_PASSCODE "$3cr3t!"
 #define SIZE_ARRAY_LENGTH 4
+const char* SHIRT_ARRAY[4] = { "(s)mall", "(m)edium", "(l)arge", "(x)tra-large" };
+#define MIN 20
+#define MAX 50
 
 void getString(char* inputStringPtr);
 bool valString(char* inputStringPtr);
-char valSize(char sizeSelect, const char *sizeArray);
+char valSize(char sizeSelect);
+bool getValidDouble(const char* buff, int min, int max);
 
 
 int main(void) {
 
-
+	//Task 2
 	//getting passcode and validating it
 	char inPasscode[ARRAY_LENGTH];
 	puts("Enter passcode");
@@ -37,20 +43,43 @@ int main(void) {
 		puts("Passcode incorrect");
 	}
 
-	//getting shirt size
-	static const char* SHIRT_SIZE[SIZE_ARRAY_LENGTH] = { "(s)mall" "(m)edium" "(l)arge" "(x)tra-large" };
 
-	printf("c", SHIRT_SIZE[0][1]);
-
-
-	printf("Select your shirt size by entering the character in parentheses: %s %s %s %s", SHIRT_SIZE[0], SHIRT_SIZE[1], SHIRT_SIZE[2], SHIRT_SIZE[3]);
+	//Task 3
+	//getting size and validating it
+	printf("Select your shirt size by entering the character in parentheses:\n%s, %s, %s, %s\n", SHIRT_ARRAY[0], SHIRT_ARRAY[1], SHIRT_ARRAY[2], SHIRT_ARRAY[3]);
 	char selectSize = getchar();
-	selectSize = valSize(selectSize, SHIRT_SIZE);
+	while (getchar() != '\n');
+	selectSize = valSize(selectSize);
 
-	printf("%c", selectSize);
-}
+	if (selectSize == EOF) {
+		puts("Error: You did not enter a valid choice");
+	}
+	switch (selectSize) {
+	case 's': puts("[Small] was selected"); 
+	break;
+	case 'm': puts("[Medium] was selected");
+	break;
+	case 'l': puts("[Large] was selected");
+	break;
+	case 'x': puts("[Xtra-Large] was selected");
+	break;
+	}
 
 
+
+	//task 4
+	char userPrice[ARRAY_LENGTH];
+	puts("Enter sales price of t-shirts");
+	getString(userPrice);
+	
+	if (getValidDouble(userPrice, MIN, MAX) ){
+		printf("You entered $%s for the t-shirt price." , userPrice);
+	}
+
+
+}//main
+
+//Task 1
 //Input argument of string pointer. Writes to string with max length, then changes new line character to \0
 void getString(char* inputStringPtr) {
 
@@ -66,7 +95,7 @@ void getString(char* inputStringPtr) {
 	if (check == '\n') {
 		inputStringPtr[length - 1] = '\0';
 	}
-}//getSTring
+}//getString
 
 
 //validates if a string is equal to a password
@@ -87,19 +116,55 @@ bool valString(char* inputStringPtr) {
 
 
 //validates if a char was entered that matches a size
-char valSize(char sizeSelect, const char *stringArray) {
+char valSize(char sizeSelect) {
 	
-
-
+	//Check entered char against the character in parenthesis.
 	for (size_t i = 0; i < SIZE_ARRAY_LENGTH; i++) {
-		if (sizeSelect == *((stringArray + i))+1) {
-			return sizeSelect;
+		if (tolower(sizeSelect) ==  SHIRT_ARRAY[i][1]) {
+			return tolower(sizeSelect);
 		}
-
 		else if (i == SIZE_ARRAY_LENGTH - 1)
 		{
 			return EOF;
 		}
+		else {
+			return EOF;
+		}
+
 	}
+
+}//valSize
+
+
+
+//validates a double 
+bool getValidDouble(const char* buff, int min, int max){
+	char *ptr;
+	const double newDouble = strtod(buff, &ptr);
+	bool valid = false;
+
+	errno = 0;
+
+	//if the buff and the ptr are the same, that means there were no numeric values in the input
+	if (ptr == buff) {
+		puts("Error: you did not enter a valid numeric value");
+	}
+	//this checks if double is equal to min or max, and and error occured
+	else if ((newDouble == DBL_MIN || newDouble == DBL_MAX) && ERANGE == errno) {
+		puts("Error: you did not enter a valid numeric value");
+	}
+	//checking if in range of min and max we want
+	else if (newDouble < min || newDouble > max) {
+		printf("Error: Enter a value from %d to %d", min, max);
+	}
+	//makes it past checks
+	else {
+		valid = true;
+	}
+
+
+	return valid;
+
+
 
 }
