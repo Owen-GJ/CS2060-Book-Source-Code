@@ -3,6 +3,7 @@ Owen Garrett Johnson
 CS2060
 HW04
 Due 7/14
+This program will ask for a passcode and tell you if it matches, it will then ask and validate shirt size, then finally shirt price
 */
 
 #include <stdio.h>
@@ -23,7 +24,7 @@ const char* SHIRT_ARRAY[4] = { "(s)mall", "(m)edium", "(l)arge", "(x)tra-large" 
 void getString(char* inputStringPtr);
 bool valString(char* inputStringPtr);
 char valSize(char sizeSelect);
-bool getValidDouble(const char* buff, int min, int max);
+bool getValidDouble(const char* buff, double* const value, int min, int max);
 
 
 int main(void) {
@@ -71,9 +72,13 @@ int main(void) {
 	char userPrice[ARRAY_LENGTH];
 	puts("Enter sales price of t-shirts");
 	getString(userPrice);
+
+	double valPrice = 0;
+	double *const valPricePtr = &valPrice;
 	
-	if (getValidDouble(userPrice, MIN, MAX) ){
-		printf("You entered $%s for the t-shirt price." , userPrice);
+	
+	if (getValidDouble(userPrice, valPricePtr, MIN, MAX) ){
+		printf("You entered $%.2lf for the t-shirt price." , valPrice);
 	}
 
 
@@ -138,23 +143,24 @@ char valSize(char sizeSelect) {
 
 
 //validates a double 
-bool getValidDouble(const char* buff, int min, int max){
+bool getValidDouble(const char* buff, double* const value, int min, int max){
 	char *ptr;
-	const double newDouble = strtod(buff, &ptr);
 	bool valid = false;
-
 	errno = 0;
+
+	*value = strtod(buff, &ptr);
+
 
 	//if the buff and the ptr are the same, that means there were no numeric values in the input
 	if (ptr == buff) {
 		puts("Error: you did not enter a valid numeric value");
 	}
 	//this checks if double is equal to min or max, and and error occured
-	else if ((newDouble == DBL_MIN || newDouble == DBL_MAX) && ERANGE == errno) {
+	else if ((*value == DBL_MIN || *value == DBL_MAX) && ERANGE == errno) {
 		puts("Error: you did not enter a valid numeric value");
 	}
 	//checking if in range of min and max we want
-	else if (newDouble < min || newDouble > max) {
+	else if (*value < min || *value > max) {
 		printf("Error: Enter a value from %d to %d", min, max);
 	}
 	//makes it past checks
