@@ -124,7 +124,7 @@ bool valString(char* inputStringPtr) {
 char valSize(char sizeSelect) {
 	
 	//Check entered char against the character in parenthesis.
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < SIZE_ARRAY_LENGTH; i++) {
 		if (tolower(sizeSelect) ==  SHIRT_ARRAY[i][1]) {
 			return tolower(sizeSelect);
 		}
