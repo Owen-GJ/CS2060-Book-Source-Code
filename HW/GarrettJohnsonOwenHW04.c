@@ -49,7 +49,7 @@ int main(void) {
 	//getting size and validating it
 	printf("Select your shirt size by entering the character in parentheses:\n%s, %s, %s, %s\n", SHIRT_ARRAY[0], SHIRT_ARRAY[1], SHIRT_ARRAY[2], SHIRT_ARRAY[3]);
 	char selectSize = getchar();
-	while (getchar() != '\n');
+	//while (getchar() != '\n');
 	selectSize = valSize(selectSize);
 
 	if (selectSize == EOF) {
