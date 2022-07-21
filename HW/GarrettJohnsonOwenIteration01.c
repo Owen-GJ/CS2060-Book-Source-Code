@@ -20,6 +20,7 @@ bool valString(char* inputStringPtr);
 char valSize(char sizeSelect);
 bool getValidDouble(const char* buff, double* const value, int min, int max);
 void fundraiser();
+bool yesNoVal();
 
 
 int main(void) {
@@ -123,6 +124,36 @@ char valSize(char sizeSelect) {
 
 
 
+//returns false when n/N entered and true when y/Y entered
+bool yesNoVal() {
+
+	//used for when a valid return is enetered
+	bool valInput = false;
+	bool returnVal = false;
+	while (!valInput) {
+		char input = getchar();
+		while (getchar() != '\n');
+
+		if (input == 'y' || input == 'Y') {
+			returnVal = true;
+			valInput = true;
+		}// y/Y
+
+		else if (input == 'n' || input == 'N') {
+			returnVal = false;
+			valInput = true;
+		}// n/N
+
+		//no correct input
+		else {
+			puts("Please enter 'y' or 'Y' for yes; 'n' or 'N' for no");
+		}//no correct input
+	}//while
+
+	return returnVal;
+}//yesNoVal
+
+
 //validates a double 
 bool getValidDouble(const char* buff, double* const value, int min, int max) {
 	char* ptr;
@@ -142,11 +173,11 @@ bool getValidDouble(const char* buff, double* const value, int min, int max) {
 	}
 	//checking if in range of min and max we want
 	else if (*value < min || *value > max) {
-		printf("Error: value not between %d to %d", min, max);
+		printf("Error: value not between %d to %d\n", min, max);
 	}
 	//has extra characters after number
 	else if (ptr[0] != '\0') {
-		printf("Error: characters \"%s\"", ptr);
+		printf("Error: characters \"%s\" after number\n", ptr);
 	}
 	//makes it past checks
 	else {
@@ -174,18 +205,37 @@ void fundraiser() {
 	getString(orgName);
 
 	//getting price and validating it
+	//setup
 	char userPrice[ARRAY_LENGTH];
-	puts("Enter sales price of t-shirts");
+	printf("Enter sales price of t-shirts between %d and %d\n", MIN, MAX);
 	getString(userPrice);
 
 	double valPrice = 0;
 	double* const valPricePtr = &valPrice;
 	
+	//recieving input and validate
+	bool correctPrice = false;
+	do {
+		while (!getValidDouble(userPrice, valPricePtr, MIN, MAX)) {
+			printf("Enter a value between %d and %d\n", MIN, MAX);
+			getString(userPrice);
+		}
 
-	while (!getValidDouble(userPrice, valPricePtr, MIN, MAX)) {
-		printf("Enter a value between %d and %d", MIN, MAX);
-		getString(userPrice);
-	}
+		printf("Is $%.2lf correct?\n", valPrice);
+		bool yOrNo = yesNoVal();
+		if (yOrNo) {
+			correctPrice = true;
+		}
+
+		else if (!yOrNo) {
+			printf("Enter a value between %d and %d\n", MIN, MAX);
+			getString(userPrice);
+		}
+
+
+	} while (!correctPrice); // a valid price has been recieved and the user has said that it works
+
+
 
 
 }
