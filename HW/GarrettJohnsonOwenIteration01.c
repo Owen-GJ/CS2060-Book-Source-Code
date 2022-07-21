@@ -8,11 +8,11 @@
 #include <errno.h>
 
 #define ARRAY_LENGTH 80
-#define CORRECT_PASSCODE "$3cr3t!"
+#define CORRECT_PASSCODE "b"
 #define SIZE_ARRAY_LENGTH 4
 const char* SHIRT_ARRAY[4] = { "(s)mall", "(m)edium", "(l)arge", "(x)tra-large" };
-#define MIN 20
-#define MAX 50
+#define MIN 10
+#define MAX 100
 #define NUMBER_OF_ATTEMPTS 3
 
 void getString(char* inputStringPtr);
@@ -83,11 +83,20 @@ bool valString(char* inputStringPtr) {
 
 	//compare input to passcode
 	int check;
+	int passSize = strlen(CORRECT_PASSCODE);
 	check = strncmp(inputStringPtr, CORRECT_PASSCODE, strlen(CORRECT_PASSCODE));
+
+	//makes sure that the inputStrPtr passcode ends at the correct place
+	bool passwordEnd = false;
+	if (inputStringPtr[strlen(CORRECT_PASSCODE)] == '\0') {
+		passwordEnd = true;
+	}
+
+
 
 	//checking if input is equal to passcode
 	bool match = false;
-	if (check == 0) {
+	if (check == 0 && passwordEnd) {
 		match = true;
 	}
 
@@ -133,7 +142,11 @@ bool getValidDouble(const char* buff, double* const value, int min, int max) {
 	}
 	//checking if in range of min and max we want
 	else if (*value < min || *value > max) {
-		printf("Error: Enter a value from %d to %d", min, max);
+		printf("Error: value not between %d to %d", min, max);
+	}
+	//has extra characters after number
+	else if (ptr[0] != '\0') {
+		printf("Error: characters \"%s\"", ptr);
 	}
 	//makes it past checks
 	else {
@@ -149,5 +162,30 @@ bool getValidDouble(const char* buff, double* const value, int min, int max) {
 
 
 void fundraiser() {
-	puts("got to fundraiser");
+
+	//*************************************
+	//Setting up fundraiser
+	//*************************************
+
+	//getting name
+	puts("Enter fundraiser orginization's name");
+
+	char orgName[ARRAY_LENGTH];
+	getString(orgName);
+
+	//getting price and validating it
+	char userPrice[ARRAY_LENGTH];
+	puts("Enter sales price of t-shirts");
+	getString(userPrice);
+
+	double valPrice = 0;
+	double* const valPricePtr = &valPrice;
+	
+
+	while (!getValidDouble(userPrice, valPricePtr, MIN, MAX)) {
+		printf("Enter a value between %d and %d", MIN, MAX);
+		getString(userPrice);
+	}
+
+
 }
