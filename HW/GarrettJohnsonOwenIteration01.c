@@ -24,11 +24,11 @@ char valSizeOrColor(char sizeSelect, int* const indexPtr, const char* array[SIZE
 bool getValidDouble(const char* buff, double* const value, int min, int max);
 void fundraiser();
 bool yesNoVal();
+int getValidZip();
 
 
 int main(void) {
-
-
+	getValidZip();
 	//validting password
 	int attempt = 0;
 	while (attempt < NUMBER_OF_ATTEMPTS) {
@@ -116,7 +116,7 @@ char valSizeOrColor(char sizeSelect, int* const indexPtr, const char* array[SIZE
 	//Check entered char against the character in parenthesis.
 	int i = 0;
 	while (charReturn == '\0') {
-		if (tolower(sizeSelect) == SHIRT_SIZE_ARRAY[i][1]) {
+		if (tolower(sizeSelect) == array[i][1]) {
 
 			charReturn = tolower(sizeSelect);
 			*indexPtr = i;
@@ -164,6 +164,31 @@ bool yesNoVal() {
 }//yesNoVal
 
 
+//validates a 5 digit zip code
+int getValidZip() {
+	
+	puts("Enter your 5 digit zip code.");
+	//get input and make sure it is only 5 digits and no characters
+	char zipString[ARRAY_LENGTH];
+	double returnValue = 0;
+	double* returnValuePtr = &returnValue;
+	char* endPtr
+
+	//
+	while (strlen(zipString) != 5) {
+		puts("Zip code should be 5 digits long, try again");
+		getString(zipString);
+	}//while
+
+	int attemptValue = 0;
+	att = strtol(zipString, endPtr, 10);
+
+
+
+}//getValidZip
+
+
+
 //validates a double 
 bool getValidDouble(const char* buff, double* const value, int min, int max) {
 	char* ptr;
@@ -196,8 +221,6 @@ bool getValidDouble(const char* buff, double* const value, int min, int max) {
 
 
 	return valid;
-
-
 
 }
 
@@ -258,6 +281,11 @@ void fundraiser() {
 
 	correctRange = false;
 	
+
+	//2D array to store how many of each shirt was bought.
+	int totalShirtArray[SIZE_COLOR_ARRAY_LENGTH][SIZE_COLOR_ARRAY_LENGTH] = { 0 };
+	
+
 	do {
 
 		//validate
@@ -289,53 +317,91 @@ void fundraiser() {
 	//Customer Purchasing
 	//******************************************
 
-
-	//getting size and validating it
-	printf("Select your shirt size by entering the character in parentheses:\n%s, %s, %s, %s\n", SHIRT_SIZE_ARRAY[0], SHIRT_SIZE_ARRAY[1],
-																									SHIRT_SIZE_ARRAY[2], SHIRT_SIZE_ARRAY[3]);
-	char selectSize = getchar();
-	while (getchar() != '\n');
-	
-	//used to return index
-	int sizeIndex;
-	int* sizeIndexPtr = &sizeIndex;
-
-	selectSize = valSizeOrColor(selectSize, sizeIndexPtr, SHIRT_SIZE_ARRAY);
-
-	while (selectSize == EOF) {
-		
-		puts("Error: You did not enter a valid choice");
-		printf("Select your shirt size by entering the character in parentheses:\n%s, %s, %s, %s\n", SHIRT_SIZE_ARRAY[0], SHIRT_SIZE_ARRAY[1], 
-																										SHIRT_SIZE_ARRAY[2], SHIRT_SIZE_ARRAY[3]);
-		selectSize = getchar();
+	int totalShirts = 0;
+	bool customerContinue = true;
+	while (customerContinue) {
+		//getting size and validating it
+		printf("Select your shirt size by entering the character in parentheses:\n%s, %s, %s, %s\n", SHIRT_SIZE_ARRAY[0], SHIRT_SIZE_ARRAY[1],
+			SHIRT_SIZE_ARRAY[2], SHIRT_SIZE_ARRAY[3]);
+		char selectSize = getchar();
 		while (getchar() != '\n');
+
+		//used to return index
+		int sizeIndex;
+		int* sizeIndexPtr = &sizeIndex;
+
 		selectSize = valSizeOrColor(selectSize, sizeIndexPtr, SHIRT_SIZE_ARRAY);
-	}//while
 
-	printf("%s was selected", SHIRT_SIZE_ARRAY[sizeIndex]);
+		while (selectSize == EOF) {
+
+			puts("Error: You did not enter a valid choice");
+			printf("Select your shirt size by entering the character in parentheses:\n%s, %s, %s, %s\n", SHIRT_SIZE_ARRAY[0], SHIRT_SIZE_ARRAY[1],
+				SHIRT_SIZE_ARRAY[2], SHIRT_SIZE_ARRAY[3]);
+			selectSize = getchar();
+			while (getchar() != '\n');
+			selectSize = valSizeOrColor(selectSize, sizeIndexPtr, SHIRT_SIZE_ARRAY);
+		}//while
+
+		printf("%s was selected\n", SHIRT_SIZE_ARRAY[sizeIndex]);
 
 
-	//getting color and validating it
-	printf("Select your shirt color by entering the character in parentheses:\n%s, %s, %s, %s\n", SHIRT_COLOR_ARRAY[0], SHIRT_COLOR_ARRAY[1], 
-																									SHIRT_COLOR_ARRAY[2], SHIRT_COLOR_ARRAY[3]);
-	char selectColor = getchar();
-	while (getchar() != '\n');
 
-	//used to return index
-	int colorIndex;
-	int* colorIndexPtr = &colorIndex;
 
-	selectColor = valSizeOrColor(selectColor, colorIndexPtr, SHIRT_COLOR_ARRAY);
 
-	while (selectColor == EOF) {
 
-		puts("Error: You did not enter a valid choice");
-		printf("Select your shirt color by entering the character in parentheses:\n%s, %s, %s, %s\n", SHIRT_COLOR_ARRAY[0], SHIRT_COLOR_ARRAY[1], 
-																										SHIRT_COLOR_ARRAY[2], SHIRT_COLOR_ARRAY[3]);
-		selectColor = getchar();
+
+		//getting color and validating it
+		printf("Select your shirt color by entering the character in parentheses:\n%s, %s, %s, %s\n", SHIRT_COLOR_ARRAY[0], SHIRT_COLOR_ARRAY[1],
+			SHIRT_COLOR_ARRAY[2], SHIRT_COLOR_ARRAY[3]);
+		char selectColor = getchar();
 		while (getchar() != '\n');
-		selectColor = valSizeOrColor(selectColor, colorIndexPtr, SHIRT_COLOR_ARRAY);
-	}//while
 
-	printf("%s was selected", SHIRT_COLOR_ARRAY[sizeIndex]);
-}
+		//used to return index
+		int colorIndex;
+		int* colorIndexPtr = &colorIndex;
+
+		selectColor = valSizeOrColor(selectColor, colorIndexPtr, SHIRT_COLOR_ARRAY);
+
+		while (selectColor == EOF) {
+
+			puts("Error: You did not enter a valid choice");
+			printf("Select your shirt color by entering the character in parentheses:\n%s, %s, %s, %s\n", SHIRT_COLOR_ARRAY[0], SHIRT_COLOR_ARRAY[1],
+				SHIRT_COLOR_ARRAY[2], SHIRT_COLOR_ARRAY[3]);
+			selectColor = getchar();
+			while (getchar() != '\n');
+			selectColor = valSizeOrColor(selectColor, colorIndexPtr, SHIRT_COLOR_ARRAY);
+		}//while
+
+		printf("%s was selected\n", SHIRT_COLOR_ARRAY[colorIndex]);
+
+
+		//add shirt into array
+		totalShirtArray[sizeIndex][colorIndex]++;
+
+
+		//See if customer want another shirt
+		puts("Do you want to purchase another shirt? Enter Y/y for yes; N/n for no.");
+		bool yOrNo = yesNoVal();
+		if (!yOrNo) {
+			customerContinue = false;
+		}
+
+		totalShirts++;
+	}//while(customsercontinue)
+
+
+	//used for debugging, shows the array of shirts sizes are rows, colors are columns
+	for (size_t row = 0; row < SIZE_COLOR_ARRAY_LENGTH; row++) {
+		for (size_t column = 0; column < SIZE_COLOR_ARRAY_LENGTH; column++) {
+			printf("%d\t", totalShirtArray[row][column]);
+		}
+		puts("");
+	}
+
+	puts("Enter your 5 digit zip code.");
+
+
+
+
+
+}//fundraiser
