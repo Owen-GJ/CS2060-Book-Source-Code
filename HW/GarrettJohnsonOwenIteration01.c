@@ -24,11 +24,12 @@ char valSizeOrColor(char sizeSelect, int* const indexPtr, const char* array[SIZE
 bool getValidDouble(const char* buff, double* const value, int min, int max);
 void fundraiser();
 bool yesNoVal();
-int getValidZip();
+long getValidZip();
+void displayRecipt(char* org, double price, double percent, int totalShirts, const char* colorArray[], const char* sizeArray[],
+	const int array[SIZE_COLOR_ARRAY_LENGTH][SIZE_COLOR_ARRAY_LENGTH]);
 
 
 int main(void) {
-	getValidZip();
 	//validting password
 	int attempt = 0;
 	while (attempt < NUMBER_OF_ATTEMPTS) {
@@ -165,26 +166,40 @@ bool yesNoVal() {
 
 
 //validates a 5 digit zip code
-int getValidZip() {
+long getValidZip() {
 	
 	puts("Enter your 5 digit zip code.");
 	//get input and make sure it is only 5 digits and no characters
 	char zipString[ARRAY_LENGTH];
-	double returnValue = 0;
-	double* returnValuePtr = &returnValue;
-	char* endPtr
-
+	long returnValue = 0;
+	char* endPtr;
+	bool valid = false;
+	errno = 0;
 	//
-	while (strlen(zipString) != 5) {
-		puts("Zip code should be 5 digits long, try again");
+	while (!valid) {
 		getString(zipString);
-	}//while
+		while (strlen(zipString) != 5) {
+			//while (getchar() != '\n');
+			puts("Zip code should be 5 digits long, try again");
+			getString(zipString);
+		}//while(strlen)
 
-	int attemptValue = 0;
-	att = strtol(zipString, endPtr, 10);
+		long attemptValue = 0;
+		attemptValue = strtol(zipString, &endPtr, 10);
 
+		//no numeric input
+		if (endPtr == zipString) {
+			puts("Enter only numeric digits, try again");
+		}//if
 
+		else {
+			valid = true;
+			returnValue = attemptValue;
+		}//else
 
+	}//while(!valid)
+
+	return returnValue;
 }//getValidZip
 
 
@@ -221,6 +236,44 @@ bool getValidDouble(const char* buff, double* const value, int min, int max) {
 
 
 	return valid;
+
+}
+
+
+void displayRecipt(char* org, double price, double percent, int totalShirts, const char* colorArray[], const char* sizeArray[],
+					const int array[SIZE_COLOR_ARRAY_LENGTH][SIZE_COLOR_ARRAY_LENGTH]) {
+
+	printf("Organization: %s\nT-Shirt purchases\n", org);
+
+	for (size_t color = 0; color < SIZE_COLOR_ARRAY_LENGTH + 1; color++) {
+
+
+		for (size_t size = 0; size < SIZE_COLOR_ARRAY_LENGTH; size++) {
+
+			//prints header for size
+			if (color == 0 && size == 0) {
+				printf("%-9s\t", "");
+				for (size_t i = 0; i < SIZE_COLOR_ARRAY_LENGTH; i++) {
+					printf("%-9s\t", sizeArray[i]);
+				}
+				puts("");
+			}
+			
+			//prints body
+
+			
+			if (size == 0) {
+				printf("%-9s\t", colorArray[color]);
+			}
+			printf("%-9d\t", array[color][size]);
+			
+		}//for size
+		puts("");
+	}//for color
+
+
+
+
 
 }
 
@@ -398,10 +451,15 @@ void fundraiser() {
 		puts("");
 	}
 
-	puts("Enter your 5 digit zip code.");
+	long zipCode = getValidZip();
+	printf("Zip Code: %ld\n", zipCode);
 
 
-
+	puts("Do you want a recipt? Enter Y/y for yes; N/n for no.");
+	bool yOrNo = yesNoVal();
+	if (yOrNo) {
+		displayRecipt(orgName, valPrice, valPercent, totalShirts, SHIRT_COLOR_ARRAY, SHIRT_SIZE_ARRAY, totalShirtArray);
+	}
 
 
 }//fundraiser
