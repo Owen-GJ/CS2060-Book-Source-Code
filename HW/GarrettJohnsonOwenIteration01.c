@@ -14,6 +14,8 @@ const char* SHIRT_ARRAY[4] = { "(s)mall", "(m)edium", "(l)arge", "(x)tra-large" 
 #define MIN 10
 #define MAX 100
 #define NUMBER_OF_ATTEMPTS 3
+#define MIN_DONATE_PERCENT 5
+#define MAX_DONATE_PERCENT 30
 
 void getString(char* inputStringPtr);
 bool valString(char* inputStringPtr);
@@ -25,9 +27,10 @@ bool yesNoVal();
 
 int main(void) {
 
-	int attempt = 0;
 
-	while (attempt < 3) {
+	//validting password
+	int attempt = 0;
+	while (attempt < NUMBER_OF_ATTEMPTS) {
 		//getting passcode and validating it
 		char inPasscode[ARRAY_LENGTH];
 		puts("Enter passcode");
@@ -40,20 +43,18 @@ int main(void) {
 			attempt = NUMBER_OF_ATTEMPTS;
 		}//if true
 
+
 		else if (!correctPasscode) {
 
 			puts("Error: The password is incorrect");
 			attempt++;
 		}//if false
 
+		if (!correctPasscode && attempt == NUMBER_OF_ATTEMPTS) {
+			puts("Exiting admin set-up");
+		}
+
 	}//while
-
-	if (attempt >= NUMBER_OF_ATTEMPTS) {
-
-		puts("Exiting admin set-up");
-
-
-	}
 
 
 }
@@ -214,7 +215,7 @@ void fundraiser() {
 	double* const valPricePtr = &valPrice;
 	
 	//recieving input and validate
-	bool correctPrice = false;
+	bool correctRange = false;
 	do {
 		while (!getValidDouble(userPrice, valPricePtr, MIN, MAX)) {
 			printf("Enter a value between %d and %d\n", MIN, MAX);
@@ -224,7 +225,7 @@ void fundraiser() {
 		printf("Is $%.2lf correct?\n", valPrice);
 		bool yOrNo = yesNoVal();
 		if (yOrNo) {
-			correctPrice = true;
+			correctRange = true;
 		}
 
 		else if (!yOrNo) {
@@ -233,9 +234,22 @@ void fundraiser() {
 		}
 
 
-	} while (!correctPrice); // a valid price has been recieved and the user has said that it works
+	} while (!correctRange); // a valid price has been recieved and the user has said that it works
+
+	//settup charity percent amount
+	printf("Enter percentage of the t-shirt sales between %%%d and %%%d that will be donated to %s", MIN_DONATE_PERCENT, MAX_DONATE_PERCENT, orgName);
+	char userPercent[ARRAY_LENGTH];
+	getString(userPercent);
+
+	double valPercent = 0;
+	double* const valPercentPtr = &valPercent;
 
 
+	correctRange = false;
+	
+	do {
+		while (!getValidDouble(userPercent, valPercentPtr, MIN_DONATE_PERCENT, MAX_DONATE_PERCENT));
+	}
 
 
 }
