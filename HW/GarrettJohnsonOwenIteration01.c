@@ -9,8 +9,9 @@
 
 #define ARRAY_LENGTH 80
 #define CORRECT_PASSCODE "b"
-#define SIZE_ARRAY_LENGTH 4
-const char* SHIRT_ARRAY[4] = { "(s)mall", "(m)edium", "(l)arge", "(x)tra-large" };
+#define SIZE_COLOR_ARRAY_LENGTH 4
+const char* SHIRT_SIZE_ARRAY[SIZE_COLOR_ARRAY_LENGTH] = { "(s)mall", "(m)edium", "(l)arge", "(x)tra-large" };
+const char* SHIRT_COLOR_ARRAY[SIZE_COLOR_ARRAY_LENGTH] = { "(w)hite", "(b)lue", "(p)ink", "(k)black" };
 #define MIN 10
 #define MAX 100
 #define NUMBER_OF_ATTEMPTS 3
@@ -19,7 +20,7 @@ const char* SHIRT_ARRAY[4] = { "(s)mall", "(m)edium", "(l)arge", "(x)tra-large" 
 
 void getString(char* inputStringPtr);
 bool valString(char* inputStringPtr);
-char valSize(char sizeSelect);
+char valSizeOrColor(char sizeSelect, int* const indexPtr, const char* array[SIZE_COLOR_ARRAY_LENGTH]);
 bool getValidDouble(const char* buff, double* const value, int min, int max);
 void fundraiser();
 bool yesNoVal();
@@ -86,7 +87,7 @@ bool valString(char* inputStringPtr) {
 	//compare input to passcode
 	int check;
 	int passSize = strlen(CORRECT_PASSCODE);
-	check = strncmp(inputStringPtr, CORRECT_PASSCODE, strlen(CORRECT_PASSCODE));
+	check = strncmp(inputStringPtr, CORRECT_PASSCODE, passSize);
 
 	//makes sure that the inputStrPtr passcode ends at the correct place
 	bool passwordEnd = false;
@@ -107,19 +108,27 @@ bool valString(char* inputStringPtr) {
 
 
 //validates if a char was entered that matches a size
-char valSize(char sizeSelect) {
+char valSizeOrColor(char sizeSelect, int* const indexPtr, const char* array[SIZE_COLOR_ARRAY_LENGTH]) {
+
+	char charReturn = '\0';
+
 
 	//Check entered char against the character in parenthesis.
-	for (int i = 0; i < SIZE_ARRAY_LENGTH; i++) {
-		if (tolower(sizeSelect) == SHIRT_ARRAY[i][1]) {
-			return tolower(sizeSelect);
-		}
-		else if (i == SIZE_ARRAY_LENGTH - 1)
-		{
-			return EOF;
-		}
+	int i = 0;
+	while (charReturn == '\0') {
+		if (tolower(sizeSelect) == SHIRT_SIZE_ARRAY[i][1]) {
 
+			charReturn = tolower(sizeSelect);
+			*indexPtr = i;
+		}
+		else if (i == SIZE_COLOR_ARRAY_LENGTH - 1)
+		{
+			charReturn = EOF;
+		}
+		i++;
 	}
+
+	return charReturn;
 
 }//valSize
 
@@ -217,12 +226,14 @@ void fundraiser() {
 	//recieving input and validate
 	bool correctRange = false;
 	do {
+		//validating
 		while (!getValidDouble(userPrice, valPricePtr, MIN, MAX)) {
 			printf("Enter a value between %d and %d\n", MIN, MAX);
 			getString(userPrice);
 		}
 
-		printf("Is $%.2lf correct?\n", valPrice);
+		//confirm
+		printf("Is $%.2lf correct? Enter Y/y for yes; N/n for no.\n", valPrice);
 		bool yOrNo = yesNoVal();
 		if (yOrNo) {
 			correctRange = true;
@@ -237,7 +248,7 @@ void fundraiser() {
 	} while (!correctRange); // a valid price has been recieved and the user has said that it works
 
 	//settup charity percent amount
-	printf("Enter percentage of the t-shirt sales between %%%d and %%%d that will be donated to %s", MIN_DONATE_PERCENT, MAX_DONATE_PERCENT, orgName);
+	printf("Enter percentage of the t-shirt sales between %%%d and %%%d that will be donated to %s\n", MIN_DONATE_PERCENT, MAX_DONATE_PERCENT, orgName);
 	char userPercent[ARRAY_LENGTH];
 	getString(userPercent);
 
@@ -248,8 +259,83 @@ void fundraiser() {
 	correctRange = false;
 	
 	do {
-		while (!getValidDouble(userPercent, valPercentPtr, MIN_DONATE_PERCENT, MAX_DONATE_PERCENT));
-	}
+
+		//validate
+		while (!getValidDouble(userPercent, valPercentPtr, MIN_DONATE_PERCENT, MAX_DONATE_PERCENT)) {
+			printf("Enter percentage of the t-shirt sales between %%%d and %%%d that will be donated to %s\n", MIN_DONATE_PERCENT, MAX_DONATE_PERCENT, orgName);
+			getString(userPercent);
+		}
+
+		//confirm
+		printf("Is %%%.2lf correct? Enter Y/y for yes; N/n for no.\n", valPercent);
+		bool yOrNo = yesNoVal();
+		if (yOrNo) {
+			correctRange = true;
+		}
+
+		else if (!yOrNo) {
+			printf("Enter percentage of the t-shirt sales between %%%d and %%%d that will be donated to %s\n", MIN_DONATE_PERCENT, MAX_DONATE_PERCENT, orgName);
+			getString(userPercent);
+		}
 
 
+	} while (!correctRange);
+
+	//display information about fundraiser
+	printf("Purchase a t-shirt for $%.2lf and %%%.2lf will be donated to %s.\n", valPrice, valPercent, orgName);
+
+
+	//******************************************
+	//Customer Purchasing
+	//******************************************
+
+
+	//getting size and validating it
+	printf("Select your shirt size by entering the character in parentheses:\n%s, %s, %s, %s\n", SHIRT_SIZE_ARRAY[0], SHIRT_SIZE_ARRAY[1],
+																									SHIRT_SIZE_ARRAY[2], SHIRT_SIZE_ARRAY[3]);
+	char selectSize = getchar();
+	while (getchar() != '\n');
+	
+	//used to return index
+	int sizeIndex;
+	int* sizeIndexPtr = &sizeIndex;
+
+	selectSize = valSizeOrColor(selectSize, sizeIndexPtr, SHIRT_SIZE_ARRAY);
+
+	while (selectSize == EOF) {
+		
+		puts("Error: You did not enter a valid choice");
+		printf("Select your shirt size by entering the character in parentheses:\n%s, %s, %s, %s\n", SHIRT_SIZE_ARRAY[0], SHIRT_SIZE_ARRAY[1], 
+																										SHIRT_SIZE_ARRAY[2], SHIRT_SIZE_ARRAY[3]);
+		selectSize = getchar();
+		while (getchar() != '\n');
+		selectSize = valSizeOrColor(selectSize, sizeIndexPtr, SHIRT_SIZE_ARRAY);
+	}//while
+
+	printf("%s was selected", SHIRT_SIZE_ARRAY[sizeIndex]);
+
+
+	//getting color and validating it
+	printf("Select your shirt color by entering the character in parentheses:\n%s, %s, %s, %s\n", SHIRT_COLOR_ARRAY[0], SHIRT_COLOR_ARRAY[1], 
+																									SHIRT_COLOR_ARRAY[2], SHIRT_COLOR_ARRAY[3]);
+	char selectColor = getchar();
+	while (getchar() != '\n');
+
+	//used to return index
+	int colorIndex;
+	int* colorIndexPtr = &colorIndex;
+
+	selectColor = valSizeOrColor(selectColor, colorIndexPtr, SHIRT_COLOR_ARRAY);
+
+	while (selectColor == EOF) {
+
+		puts("Error: You did not enter a valid choice");
+		printf("Select your shirt color by entering the character in parentheses:\n%s, %s, %s, %s\n", SHIRT_COLOR_ARRAY[0], SHIRT_COLOR_ARRAY[1], 
+																										SHIRT_COLOR_ARRAY[2], SHIRT_COLOR_ARRAY[3]);
+		selectColor = getchar();
+		while (getchar() != '\n');
+		selectColor = valSizeOrColor(selectColor, colorIndexPtr, SHIRT_COLOR_ARRAY);
+	}//while
+
+	printf("%s was selected", SHIRT_COLOR_ARRAY[sizeIndex]);
 }
