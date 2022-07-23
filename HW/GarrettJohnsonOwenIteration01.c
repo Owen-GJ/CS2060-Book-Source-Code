@@ -9,9 +9,10 @@
 
 #define ARRAY_LENGTH 80
 #define CORRECT_PASSCODE "b"
-#define SIZE_COLOR_ARRAY_LENGTH 4
-const char* SHIRT_SIZE_ARRAY[SIZE_COLOR_ARRAY_LENGTH] = { "(s)mall", "(m)edium", "(l)arge", "(x)tra-large" };
-const char* SHIRT_COLOR_ARRAY[SIZE_COLOR_ARRAY_LENGTH] = { "(w)hite", "(b)lue", "(p)ink", "(k)black" };
+#define SIZE_ARRAY_LENGTH 4
+#define COLOR_ARRAY_LENGTH 4
+const char* SHIRT_SIZE_ARRAY[SIZE_ARRAY_LENGTH] = { "(s)mall", "(m)edium", "(l)arge", "(x)tra-large" };
+const char* SHIRT_COLOR_ARRAY[SIZE_ARRAY_LENGTH] = { "(w)hite", "(b)lue", "(p)ink", "(k)black" };
 #define MIN 10
 #define MAX 100
 #define NUMBER_OF_ATTEMPTS 3
@@ -20,13 +21,13 @@ const char* SHIRT_COLOR_ARRAY[SIZE_COLOR_ARRAY_LENGTH] = { "(w)hite", "(b)lue", 
 
 void getString(char* inputStringPtr);
 bool valString(char* inputStringPtr);
-char valSizeOrColor(char sizeSelect, int* const indexPtr, const char* array[SIZE_COLOR_ARRAY_LENGTH]);
+char valSizeOrColor(char sizeSelect, int* const indexPtr, const char* array[SIZE_ARRAY_LENGTH]);
 bool getValidDouble(const char* buff, double* const value, int min, int max);
 void fundraiser();
 bool yesNoVal();
 long getValidZip();
 void displaySummary(char* org, double price, double percent, int totalShirts, const char* colorArray[], const char* sizeArray[],
-	const int array[SIZE_COLOR_ARRAY_LENGTH][SIZE_COLOR_ARRAY_LENGTH]);
+	const int array[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH]);
 
 
 int main(void) {
@@ -111,7 +112,7 @@ bool valString(char* inputStringPtr) {
 
 
 //validates if a char was entered that matches a size
-char valSizeOrColor(char sizeSelect, int* const indexPtr, const char* array[SIZE_COLOR_ARRAY_LENGTH]) {
+char valSizeOrColor(char sizeSelect, int* const indexPtr, const char* array[]) {
 
 	char charReturn = '\0';
 
@@ -124,7 +125,7 @@ char valSizeOrColor(char sizeSelect, int* const indexPtr, const char* array[SIZE
 			charReturn = tolower(sizeSelect);
 			*indexPtr = i;
 		}
-		else if (i == SIZE_COLOR_ARRAY_LENGTH - 1)
+		else if (i == (int)strlen(*array) - 1)
 		{
 			charReturn = EOF;
 		}
@@ -243,19 +244,19 @@ bool getValidDouble(const char* buff, double* const value, int min, int max) {
 
 
 void displaySummary(char* org, double price, double percent, int totalShirts, const char* colorArray[], const char* sizeArray[],
-					const int array[SIZE_COLOR_ARRAY_LENGTH][SIZE_COLOR_ARRAY_LENGTH]) {
+					const int array[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH]) {
 
 	printf("Organization: %s\nT-Shirt purchases\n", org);
 
-	for (size_t color = 0; color < SIZE_COLOR_ARRAY_LENGTH; color++) {
+	for (size_t color = 0; color < COLOR_ARRAY_LENGTH; color++) {
 
 
-		for (size_t size = 0; size < SIZE_COLOR_ARRAY_LENGTH; size++) {
+		for (size_t size = 0; size < SIZE_ARRAY_LENGTH; size++) {
 
 			//prints header for size
 			if (color == 0 && size == 0) {
 				printf("%-9s\t", "");
-				for (size_t i = 0; i < SIZE_COLOR_ARRAY_LENGTH; i++) {
+				for (size_t i = 0; i < SIZE_ARRAY_LENGTH; i++) {
 					printf("%-9s\t", sizeArray[i]);
 				}
 				puts("");
@@ -281,12 +282,12 @@ void displaySummary(char* org, double price, double percent, int totalShirts, co
 }//displayRecipt
 
 
-void displayRecipt(const char* colorArray[], const char* sizeArray[], const int array[SIZE_COLOR_ARRAY_LENGTH][SIZE_COLOR_ARRAY_LENGTH],
+void displayRecipt(const char* colorArray[], const char* sizeArray[], const int array[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH],
 					double price, int totalShirts, double charityTotalyShirts, char* org, double percent) {
 	
 	//prints out all the shirts
-	for (size_t color = 0; color < SIZE_COLOR_ARRAY_LENGTH; color++) {
-		for (size_t size = 0; size < SIZE_COLOR_ARRAY_LENGTH; size++) {
+	for (size_t color = 0; color < COLOR_ARRAY_LENGTH; color++) {
+		for (size_t size = 0; size < SIZE_ARRAY_LENGTH; size++) {
 
 			for (int i = 0; i < array[color][size]; i++) {
 				printf("%s %s tshirt: $%.2lf\n", sizeArray[size], colorArray[color], price);
@@ -363,7 +364,7 @@ void fundraiser() {
 	
 
 	//2D array to store how many of each shirt was bought.
-	int totalShirtArray[SIZE_COLOR_ARRAY_LENGTH][SIZE_COLOR_ARRAY_LENGTH] = { 0 };
+	int totalShirtArray[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH] = { 0 };
 	
 
 	do {
@@ -413,7 +414,7 @@ void fundraiser() {
 		bool shutdown = false;
 
 		//used for each sale
-		int salesShirtArray[SIZE_COLOR_ARRAY_LENGTH][SIZE_COLOR_ARRAY_LENGTH] = { 0 };
+		int salesShirtArray[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH] = { 0 };
 
 		//create space between last customer or admin setup
 		puts("\n\n\n");
@@ -571,8 +572,8 @@ void fundraiser() {
 			totalCharityShirts+= totalSalesShirts;
 
 			//adds all of the shirts that have been purchased to totalcharity shirts array
-			for (int row = 0; row < SIZE_COLOR_ARRAY_LENGTH; row++) {
-				for (int column = 0; column < SIZE_COLOR_ARRAY_LENGTH; column++) {
+			for (int row = 0; row < SIZE_ARRAY_LENGTH; row++) {
+				for (int column = 0; column < COLOR_ARRAY_LENGTH; column++) {
 
 					totalShirtArray[row][column] += salesShirtArray[row][column];
 
