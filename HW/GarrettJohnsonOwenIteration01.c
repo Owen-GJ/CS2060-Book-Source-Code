@@ -464,6 +464,7 @@ void fundraiser() {
 					
 
 					if (correctPasscode) {
+						puts("\n");
 						displaySummary(orgName, valPrice, valPercent, totalCharityShirts, SHIRT_COLOR_ARRAY, SHIRT_SIZE_ARRAY, totalShirtArray);
 
 						attempt = NUMBER_OF_ATTEMPTS;
