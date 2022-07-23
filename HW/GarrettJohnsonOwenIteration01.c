@@ -19,15 +19,17 @@ const char* SHIRT_COLOR_ARRAY[SIZE_ARRAY_LENGTH] = { "(w)hite", "(b)lue", "(p)in
 #define MIN_DONATE_PERCENT 5
 #define MAX_DONATE_PERCENT 30
 
-void getString(char* inputStringPtr);
-bool valString(char* inputStringPtr);
-char valSizeOrColor(char sizeSelect, int* const indexPtr, const char* array[SIZE_ARRAY_LENGTH]);
-bool getValidDouble(const char* buff, double* const value, int min, int max);
-void fundraiser();
-bool yesNoVal();
-long getValidZip();
+void displayRecipt(const char* colorArray[], const char* sizeArray[], const int array[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH],
+	double price, int totalShirts, double charityTotalyShirts, char* org, double percent);
 void displaySummary(char* org, double price, double percent, int totalShirts, const char* colorArray[], const char* sizeArray[],
 	const int array[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH]);
+void fundraiser();
+void getString(char* inputStringPtr);
+bool getValidDouble(const char* buff, double* const value, int min, int max);
+long getValidZip();
+char valSizeOrColor(char sizeSelect, int* const indexPtr, const char* array[]);
+bool valString(char* inputStringPtr);
+bool yesNoVal();
 
 
 
