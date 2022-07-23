@@ -8,7 +8,7 @@
 #include <errno.h>
 
 #define ARRAY_LENGTH 80
-#define CORRECT_PASSCODE "b"
+#define CORRECT_PASSCODE "t33$4U"
 #define SIZE_ARRAY_LENGTH 4
 #define COLOR_ARRAY_LENGTH 4
 const char* SHIRT_SIZE_ARRAY[SIZE_ARRAY_LENGTH] = { "(s)mall", "(m)edium", "(l)arge", "(x)tra-large" };
