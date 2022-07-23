@@ -30,6 +30,7 @@ void displaySummary(char* org, double price, double percent, int totalShirts, co
 	const int array[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH]);
 
 
+
 int main(void) {
 	//validting password
 	int attempt = 0;
