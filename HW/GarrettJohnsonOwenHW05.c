@@ -21,7 +21,7 @@ void addPet(Pet** headPtr, char name[NAME_LENGTH], int age);
 void displayPets(Pet** headPtr);
 bool removePet(Pet** headPtr ,char name[NAME_LENGTH]);
 void removeRemainingPets(Pet** headPointer);
-
+bool yesNoVal();
 
 
 int main(void) {
@@ -105,15 +105,15 @@ void addPet(Pet** headPtr,char name[NAME_LENGTH], int age) {
 //removes 1 instance of a pet by name. Return true if successful, false if no pets to remove
 bool removePet(Pet** headPtr, char name[NAME_LENGTH]) {
 	bool success = false;
-	Pet* currentPtr = *headPtr;
-	Pet* previousPtr = NULL;
+	Pet *currentPtr = *headPtr;
+	Pet *previousPtr = NULL;
 
 
 	//There are pets still in the List
 	if (*headPtr != NULL) {
 
 		//check if headPtr is Pet to remove
-		if (strcmp((*headPtr)->name, name)) {
+		if (strcmp((*headPtr)->name, name) == 0) {
 			//set new head as the next pet in list
 			*headPtr = (*headPtr)->nextPtr;
 
@@ -224,3 +224,32 @@ void removeRemainingPets(Pet** headPtr) {
 	//make head null
 	*headPtr = NULL;
 }//removeRemainingPets
+
+
+bool yesNoVal() {
+
+	//used for when a valid return is enetered
+	bool valInput = false;
+	bool returnVal = false;
+	while (!valInput) {
+		char input = getchar();
+		while (getchar() != '\n');
+
+		if (input == 'y' || input == 'Y') {
+			returnVal = true;
+			valInput = true;
+		}// y/Y
+
+		else if (input == 'n' || input == 'N') {
+			returnVal = false;
+			valInput = true;
+		}// n/N
+
+		//no correct input
+		else {
+			puts("Please enter 'y' or 'Y' for yes; 'n' or 'N' for no");
+		}//no correct input
+	}//while
+
+	return returnVal;
+}//yesNoVal
