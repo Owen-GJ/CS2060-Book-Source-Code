@@ -119,40 +119,41 @@ bool removePet(Pet** headPtr, char name[NAME_LENGTH]) {
 
 			//free memory of Pet
 			free(currentPtr);
+			currentPtr = NULL;
 
 		}//if head is pet to remove
 
-
-
-		//search for first pet with matching name
-		while (currentPtr != NULL && strcmp(name, currentPtr->name) != 0) {
-			//set previous pointer to this index
-			previousPtr = currentPtr;
-
-			//set current pointer to nextPet
-			currentPtr = currentPtr->nextPtr;
-		}//while search for pet name
-
-		//if pet exists
-		if (currentPtr != NULL) {
-
-			//set privous ptr to pet after current pet
-			previousPtr = currentPtr->nextPtr;
-
-			//remove current pet
-			free(currentPtr);
-			currentPtr = NULL;
-
-			success = true;
-		}//if pet exists
-
-
-		//no pet matching name found
+		//if headPtr is not pet to remove
 		else {
-			puts("Pet to remove not found");
-		}
+			//search for first pet with matching name
+			while (currentPtr != NULL && strcmp(name, currentPtr->name) != 0) {
+				//set previous pointer to this index
+				previousPtr = currentPtr;
+
+				//set current pointer to nextPet
+				currentPtr = currentPtr->nextPtr;
+			}//while search for pet name
+
+			//if pet exists
+			if (currentPtr != NULL) {
+
+				//set privous ptr to pet after current pet
+				previousPtr->nextPtr = currentPtr->nextPtr;
+
+				//remove current pet
+				free(currentPtr);
+				currentPtr = NULL;
+
+				success = true;
+			}//if pet exists
 
 
+			//no pet matching name found
+			else {
+				puts("Pet to remove not found");
+			}
+
+		}//head is not pet to remove
 
 
 	}//if (pets still in list)
