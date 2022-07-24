@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <stdbool.h>
 
 #define NAME_LENGTH 80
 
@@ -18,9 +18,9 @@ typedef struct pet {
 
 
 void addPet(Pet** headPtr, char name[NAME_LENGTH], int age);
-void displayPets(Pet* headPointer);
-void pop(char name[NAME_LENGTH]);
-void removeRemainingPets(Pet* headPointer);
+void displayPets(Pet** headPtr);
+bool removePet(Pet** headPtr ,char name[NAME_LENGTH]);
+void removeRemainingPets(Pet** headPointer);
 
 
 
@@ -64,7 +64,7 @@ void addPet(Pet** headPtr,char name[NAME_LENGTH], int age) {
 
 
 		//finds where in the list the Pet will fit alphabetically
-		while (currentPtr != NULL && currentPtr->name[0] <= name[0]) {
+		while (currentPtr != NULL && strcmp(name, currentPtr->name) >= 0) {
 
 			//set privous pointer to current pointer. This is so that it can keep the previous pointer accurate as currentpointer
 			//will be set to the next index
@@ -99,3 +99,127 @@ void addPet(Pet** headPtr,char name[NAME_LENGTH], int age) {
 	}//else
 
 }//addPet
+
+
+
+//removes 1 instance of a pet by name. Return true if successful, false if no pets to remove
+bool removePet(Pet** headPtr, char name[NAME_LENGTH]) {
+	bool success = false;
+	Pet* currentPtr = *headPtr;
+	Pet* previousPtr = NULL;
+
+
+	//There are pets still in the List
+	if (*headPtr != NULL) {
+
+		//check if headPtr is Pet to remove
+		if (strcmp((*headPtr)->name, name)) {
+			//set new head as the next pet in list
+			*headPtr = (*headPtr)->nextPtr;
+
+			//free memory of Pet
+			free(currentPtr);
+
+		}//if head is pet to remove
+
+
+
+		//search for first pet with matching name
+		while (currentPtr != NULL && strcmp(name, currentPtr->name) != 0) {
+			//set previous pointer to this index
+			previousPtr = currentPtr;
+
+			//set current pointer to nextPet
+			currentPtr = currentPtr->nextPtr;
+		}//while search for pet name
+
+		//if pet exists
+		if (currentPtr != NULL) {
+
+			//set privous ptr to pet after current pet
+			previousPtr = currentPtr->nextPtr;
+
+			//remove current pet
+			free(currentPtr);
+			currentPtr = NULL;
+
+			success = true;
+		}//if pet exists
+
+
+		//no pet matching name found
+		else {
+			puts("Pet to remove not found");
+		}
+
+
+
+
+	}//if (pets still in list)
+
+
+	//If no pets in List
+	else {
+		puts("No pets in List");
+	}//else( no pets in List
+
+
+
+	//return if successful
+	return success;
+}//removePet
+
+
+//display all the pets
+void displayPets(Pet** headPtr) {
+	
+	Pet *currentPtr = *headPtr;
+
+	//check if List is empty
+	//Not empty
+	if (currentPtr != NULL) {
+
+		//header for display
+		puts("The names in alphabetical order:");
+		//iterate through list and display name and age
+		while (currentPtr != NULL) {
+
+			printf("%s is %d years old\n", currentPtr->name, currentPtr->age);
+			currentPtr = currentPtr->nextPtr;
+
+
+		}//iterate through
+
+
+	}//not empty
+
+	
+	//empty
+	else {
+		puts("No pets in list");
+	}//empty
+
+
+}//displayPets
+
+
+//clears Pet list of any remaining pets if there are any
+void removeRemainingPets(Pet** headPtr) {
+	Pet* currentPtr = *headPtr;
+	Pet* nextPtr = NULL;
+
+	//iterate through list
+	while (currentPtr != NULL) {
+		//used to get to next pet
+		nextPtr = currentPtr->nextPtr;
+
+		//free current pet
+		free(currentPtr);
+
+		//move current to next
+		currentPtr = nextPtr;
+	}//iterate through list
+
+	//make head null
+	*headPtr = NULL;
+}//removeRemainingPets
