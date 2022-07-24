@@ -17,19 +17,56 @@ typedef struct pet {
 }Pet;
 
 
-void addPet(Pet** headPtr, char name[NAME_LENGTH], int age);
+void addPet(Pet** headPtr, const char name[NAME_LENGTH], int age);
 void displayPets(Pet** headPtr);
-bool removePet(Pet** headPtr ,char name[NAME_LENGTH]);
+bool removePet(Pet** headPtr , const char name[NAME_LENGTH]);
 void removeRemainingPets(Pet** headPointer);
 bool yesNoVal();
+void getString(char* inputStringPtr);
 
 
 int main(void) {
 
+	//create null headPtr
+	Pet* headPtr = NULL;
+	bool addContinue = true;
+	do {
+		
 
 
+		//get name
+		printf("%s", "Enter name: ");
+		char name[NAME_LENGTH];
+		getString(name);
+
+		//next line
+		puts("");
+
+		//get age
+		printf("%s", "Enter age: ");
+		char ageStr[NAME_LENGTH];
+		getString(ageStr);
+		char* endPtr = NULL;
+		int age = strtol(ageStr, &endPtr, 10);
+
+		//next line and space
+		puts("\n");
+
+		//add to list
+		addPet(&headPtr, name, age);
+
+		printf("%s", "Do you want to add another pet? Please enter (y)es or (n)o: ");
+		
+		//if no break out of while
+		if (yesNoVal()) {
+			addContinue = false;
+		}
 
 
+	} while (addContinue);//do while to add pets
+
+
+	displayPets(&headPtr);
 
 
 
@@ -42,7 +79,7 @@ int main(void) {
 
 
 //creates a pet struct and adds it to a linked list in alphabetical order
-void addPet(Pet** headPtr,char name[NAME_LENGTH], int age) {
+void addPet(Pet** headPtr, const char name[NAME_LENGTH], int age) {
 	
 	//create memory for pet and add pointer
 	Pet* newPetPtr = malloc(sizeof(Pet));
@@ -103,7 +140,7 @@ void addPet(Pet** headPtr,char name[NAME_LENGTH], int age) {
 
 
 //removes 1 instance of a pet by name. Return true if successful, false if no pets to remove
-bool removePet(Pet** headPtr, char name[NAME_LENGTH]) {
+bool removePet(Pet** headPtr, const char name[NAME_LENGTH]) {
 	bool success = false;
 	Pet *currentPtr = *headPtr;
 	Pet *previousPtr = NULL;
@@ -253,3 +290,21 @@ bool yesNoVal() {
 
 	return returnVal;
 }//yesNoVal
+
+
+//Input argument of string pointer. Writes to string with max length, then changes new line character to \0
+void getString(char* inputStringPtr) {
+
+	//get input
+	fgets(inputStringPtr, NAME_LENGTH, stdin);
+	size_t length;
+
+	//change new line character '\n' to null character '\0' if '\n' exists
+	length = strlen(inputStringPtr);
+
+	char check = inputStringPtr[length - 1];
+
+	if (check == '\n') {
+		inputStringPtr[length - 1] = '\0';
+	}
+}//getString
