@@ -29,18 +29,17 @@ int main(void) {
 
 	//create null headPtr
 	Pet* headPtr = NULL;
-	bool addContinue = true;
+	bool whileContinue = true;
+
+
+	//add pets
 	do {
 		
-
 
 		//get name
 		printf("%s", "Enter name: ");
 		char name[NAME_LENGTH];
 		getString(name);
-
-		//next line
-		puts("");
 
 		//get age
 		printf("%s", "Enter age: ");
@@ -57,23 +56,67 @@ int main(void) {
 
 		printf("%s", "Do you want to add another pet? Please enter (y)es or (n)o: ");
 		
+		
 		//if no break out of while
-		if (yesNoVal()) {
-			addContinue = false;
+		if (!yesNoVal()) {
+			whileContinue = false;
+			//spacer
+			puts("");
 		}
 
 
-	} while (addContinue);//do while to add pets
+
+	} while (whileContinue);//do while to add pets
 
 
 	displayPets(&headPtr);
+	//spacer
+	puts("");
+
+	//remove pets
+	whileContinue = true;
+	do {
+		printf("%s", "Do you want to remove a pet? Please enter (y)es or (n)o: ");
 
 
+		//remove pet
+		if (yesNoVal()) {
+
+			//get name
+			printf("%s", "\nEnter the pet's name to be removed: ");
+			char petToRemove[NAME_LENGTH];
+			getString(petToRemove);
+
+			//remove the pet
+			bool removed = removePet(&headPtr, petToRemove);
+
+			if (!removed) {
+				puts("There are no more pets in the list");
+				whileContinue = false;
+			}
+
+			//spacer
+			puts("");
+			displayPets(&headPtr);
+		}//remove pet
+		
+		//don't remove pet
+		else {
+			whileContinue = false;
+		}
+		
+	} while (whileContinue);
+	//spacer
+	puts("");
 
 
-
-
-
+	//show pets
+	displayPets(&headPtr);
+	puts("");
+	//remove pets then show empty list
+	puts("Remove all pets from memory before exiting program");
+	removeRemainingPets(&headPtr);
+	displayPets(&headPtr);
 
 }
 
@@ -157,6 +200,7 @@ bool removePet(Pet** headPtr, const char name[NAME_LENGTH]) {
 			//free memory of Pet
 			free(currentPtr);
 			currentPtr = NULL;
+			success = true;
 
 		}//if head is pet to remove
 
@@ -185,9 +229,14 @@ bool removePet(Pet** headPtr, const char name[NAME_LENGTH]) {
 			}//if pet exists
 
 
+
+
+
+
 			//no pet matching name found
 			else {
-				puts("Pet to remove not found");
+				printf("%s is not found in the list of pets\n", name);
+				success = true;
 			}
 
 		}//head is not pet to remove
@@ -195,12 +244,15 @@ bool removePet(Pet** headPtr, const char name[NAME_LENGTH]) {
 
 	}//if (pets still in list)
 
-
 	//If no pets in List
 	else {
 		puts("No pets in List");
 	}//else( no pets in List
 
+	//if no pets exists after remove
+	if (*headPtr == NULL) {
+		success = false;
+	}
 
 
 	//return if successful
