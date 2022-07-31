@@ -132,7 +132,7 @@ void addPet(Pet** headPtr, const char name[NAME_LENGTH], int age) {
 
 		//setup new Pet
 		//add name, make sure not to copy address but copy contents
-		strcpy(newPetPtr->name, name);
+		strncpy(newPetPtr->name, name, NAME_LENGTH);
 		newPetPtr->age = age;
 		newPetPtr->nextPtr = NULL;
 
