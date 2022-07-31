@@ -8,11 +8,13 @@
 #include <errno.h>
 
 #define ARRAY_LENGTH 80
-#define CORRECT_PASSCODE "t33$4U"
+#define CORRECT_PASSCODE "b"
 #define SIZE_ARRAY_LENGTH 4
 #define COLOR_ARRAY_LENGTH 4
 const char* SHIRT_SIZE_ARRAY[SIZE_ARRAY_LENGTH] = { "(s)mall", "(m)edium", "(l)arge", "(x)tra-large" };
+enum sizes { SMALL1, MEDIUM, LARGE, EXTRA_LARGE };
 const char* SHIRT_COLOR_ARRAY[SIZE_ARRAY_LENGTH] = { "(w)hite", "(b)lue", "(p)ink", "(k)black" };
+enum colors {WHITE, BLUE, PINK, BLACK};
 #define MIN 10
 #define MAX 100
 #define NUMBER_OF_ATTEMPTS 3
@@ -30,6 +32,14 @@ long getValidZip();
 char valSizeOrColor(char sizeSelect, int* const indexPtr, const char* array[]);
 bool valString(char* inputStringPtr);
 bool yesNoVal();
+void revisedFund();
+void customerSize();
+void customerColor();
+void setupFundraiser();
+void setup(double* price, double* percent, const char orgName[]);
+double setPrice(int min, int max);
+double setPercent(int min, int max, const char orgName[]);
+void setName(char* orgName);
 
 
 
@@ -46,7 +56,7 @@ int main(void) {
 		bool correctPasscode = valString(inPasscode);
 
 		if (correctPasscode) {
-			fundraiser();
+			revisedFund();
 
 			attempt = NUMBER_OF_ATTEMPTS;
 		}//if true
@@ -93,7 +103,7 @@ bool valString(char* inputStringPtr) {
 
 	//compare input to passcode
 	int check;
-	int passSize = strlen(CORRECT_PASSCODE);
+	size_t passSize = strlen(CORRECT_PASSCODE);
 	check = strncmp(inputStringPtr, CORRECT_PASSCODE, passSize);
 
 	//makes sure that the inputStrPtr passcode ends at the correct place
@@ -173,7 +183,7 @@ bool yesNoVal() {
 
 //validates a 5 digit zip code
 long getValidZip() {
-	
+
 	puts("Enter your 5 digit zip code.");
 	//get input and make sure it is only 5 digits and no characters
 	char zipString[ARRAY_LENGTH];
@@ -247,7 +257,7 @@ bool getValidDouble(const char* buff, double* const value, int min, int max) {
 
 
 void displaySummary(char* org, double price, double percent, int totalShirts, const char* colorArray[], const char* sizeArray[],
-					const int array[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH]) {
+	const int array[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH]) {
 
 	printf("Organization: %s\nT-Shirt purchases\n", org);
 
@@ -264,15 +274,15 @@ void displaySummary(char* org, double price, double percent, int totalShirts, co
 				}
 				puts("");
 			}
-			
+
 			//prints body
 
-			
+
 			if (size == 0) {
 				printf("%-9s\t", colorArray[color]);
 			}
 			printf("%-9d\t", array[color][size]);
-			
+
 		}//for size
 		puts("");
 	}//for color
@@ -286,8 +296,8 @@ void displaySummary(char* org, double price, double percent, int totalShirts, co
 
 
 void displayRecipt(const char* colorArray[], const char* sizeArray[], const int array[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH],
-					double price, int totalShirts, double charityTotalyShirts, char* org, double percent) {
-	
+	double price, int totalShirts, double charityTotalyShirts, char* org, double percent) {
+
 	//prints out all the shirts
 	for (size_t color = 0; color < COLOR_ARRAY_LENGTH; color++) {
 		for (size_t size = 0; size < SIZE_ARRAY_LENGTH; size++) {
@@ -304,7 +314,7 @@ void displayRecipt(const char* colorArray[], const char* sizeArray[], const int 
 	//print total, and ending message
 	printf("Total Charge: $%.2lf\n", (totalShirts * price));
 	printf("Thank you for supporting %s.\n%%%.2lf will be donated to charity.\n$%.2lf has been raised so far", org, percent,
-																	((percent / 100) * ((charityTotalyShirts + totalShirts) * price)));
+		((percent / 100) * ((charityTotalyShirts + totalShirts) * price)));
 }
 
 
@@ -329,7 +339,7 @@ void fundraiser() {
 
 	double valPrice = 0;
 	double* const valPricePtr = &valPrice;
-	
+
 	//recieving input and validate
 	bool correctRange = false;
 	do {
@@ -364,11 +374,11 @@ void fundraiser() {
 
 
 	correctRange = false;
-	
+
 
 	//2D array to store how many of each shirt was bought.
 	int totalShirtArray[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH] = { 0 };
-	
+
 
 	do {
 
@@ -400,17 +410,17 @@ void fundraiser() {
 	//******************************************
 	//Customer Purchasing
 	//******************************************
-	
+
 	//used for searching for admin shutdown if not shutdown, then continue selling
-	
-	
+
+
 	//used for more customer status, if admin shutdown this turns false
 	bool moreCustomers = true;
 
 	//used to keep track of all shirt sales
 	int totalCharityShirts = 0;
 
-	
+
 	while (moreCustomers) {
 
 		//used for searching for admin shutdown if not shutdown, then continue selling
@@ -439,7 +449,7 @@ void fundraiser() {
 
 			selectSize = valSizeOrColor(selectSize, sizeIndexPtr, SHIRT_SIZE_ARRAY);
 
-			
+
 			while (selectSize == EOF) {
 
 				puts("Error: You did not enter a valid choice");
@@ -453,7 +463,7 @@ void fundraiser() {
 
 
 			if (selectSize == 'q') {
-				
+
 				//this shows an attempt was made
 				shutdown = true;
 				customerContinue = false;
@@ -465,7 +475,7 @@ void fundraiser() {
 					puts("Enter passcode");
 					getString(inPasscode);
 					bool correctPasscode = valString(inPasscode);
-					
+
 
 					if (correctPasscode) {
 						puts("\n");
@@ -473,8 +483,8 @@ void fundraiser() {
 
 						attempt = NUMBER_OF_ATTEMPTS;
 						moreCustomers = false;
-						
-						
+
+
 					}//if true
 
 
@@ -488,7 +498,7 @@ void fundraiser() {
 						puts("Returning to sales mode, current sale has been restarted.");
 					}//if
 
-					}// while attempt < num
+				}// while attempt < num
 
 
 			}//if( size == q)
@@ -546,7 +556,7 @@ void fundraiser() {
 				}
 
 				totalSalesShirts++;
-				
+
 
 			}//if(!shutdown)
 
@@ -564,15 +574,15 @@ void fundraiser() {
 			bool yOrNo = yesNoVal();
 			if (yOrNo) {
 				puts("\n");
-				displayRecipt(SHIRT_COLOR_ARRAY, SHIRT_SIZE_ARRAY, salesShirtArray , valPrice, totalSalesShirts, totalCharityShirts, orgName, valPercent);
+				displayRecipt(SHIRT_COLOR_ARRAY, SHIRT_SIZE_ARRAY, salesShirtArray, valPrice, totalSalesShirts, totalCharityShirts, orgName, valPercent);
 			}
 			else {
 				puts("\n");
 				printf("Thank you for supporting %s. $%.2lf of your purchase will be donated.\n$%.2lf has been raised so far", orgName,
-					((valPercent / 100)* (totalSalesShirts* valPrice)), (valPercent / 100)* ((totalCharityShirts + totalSalesShirts)* valPrice));
+					((valPercent / 100) * (totalSalesShirts * valPrice)), (valPercent / 100) * ((totalCharityShirts + totalSalesShirts) * valPrice));
 			}
 
-			totalCharityShirts+= totalSalesShirts;
+			totalCharityShirts += totalSalesShirts;
 
 			//adds all of the shirts that have been purchased to totalcharity shirts array
 			for (int row = 0; row < SIZE_ARRAY_LENGTH; row++) {
@@ -592,5 +602,157 @@ void fundraiser() {
 		//end of while for checking for Q
 
 	}//while(morecustomers)
+
+}//fundraiser
+
+
+//sets the organization name
+void setName(char orgName[]) {
+
+	//getting name
+	puts("Enter fundraiser orginization's name");
+
+	getString(orgName);
+
+}
+
+
+
+//sets the price of a fundraiser
+double setPrice(int min, int max) {
+
+	//getting price and validating it
+	//setup
+	char userPrice[ARRAY_LENGTH];
+	printf("Enter sales price of t-shirts between %d and %d\n", MIN, MAX);
+	getString(userPrice);
+
+	double valPrice = 0;
+	double* const valPricePtr = &valPrice;
+
+	//recieving input and validate
+	bool correctRange = false;
+	do {
+		//validating
+		while (!getValidDouble(userPrice, valPricePtr, MIN, MAX)) {
+			printf("Enter a value between %d and %d\n", MIN, MAX);
+			getString(userPrice);
+		}
+
+		//confirm
+		printf("Is $%.2lf correct? Enter Y/y for yes; N/n for no.\n", valPrice);
+		bool yOrNo = yesNoVal();
+		if (yOrNo) {
+			correctRange = true;
+		}
+
+		else if (!yOrNo) {
+			printf("Enter a value between %d and %d\n", MIN, MAX);
+			getString(userPrice);
+		}
+
+
+	} while (!correctRange); // a valid price has been recieved and the user has said that it works
+
+
+
+	return valPrice;
+}
+
+
+
+//sets the donation percent of the fundraiser
+double setPercent(int min, int max, const char orgName[]) {
+
+
+	//settup charity percent amount
+	printf("Enter percentage of the t-shirt sales between %%%d and %%%d that will be donated to %s\n", MIN_DONATE_PERCENT, MAX_DONATE_PERCENT, orgName);
+	char userPercent[ARRAY_LENGTH];
+	getString(userPercent);
+
+
+
+	double valPercent = 0;
+	double* const valPercentPtr = &valPercent;
+
+
+	bool correctRange = false;
+
+
+	do {
+
+		//validate
+		while (!getValidDouble(userPercent, valPercentPtr, MIN_DONATE_PERCENT, MAX_DONATE_PERCENT)) {
+			printf("Enter percentage of the t-shirt sales between %%%d and %%%d that will be donated to %s\n", MIN_DONATE_PERCENT, MAX_DONATE_PERCENT, orgName);
+			getString(userPercent);
+		}
+
+		//confirm
+		printf("Is %%%.2lf correct? Enter Y/y for yes; N/n for no.\n", valPercent);
+		bool yOrNo = yesNoVal();
+		if (yOrNo) {
+			correctRange = true;
+		}
+
+		else if (!yOrNo) {
+			printf("Enter percentage of the t-shirt sales between %%%d and %%%d that will be donated to %s\n", MIN_DONATE_PERCENT, MAX_DONATE_PERCENT, orgName);
+			getString(userPercent);
+		}
+
+
+	} while (!correctRange);
+
+
+
+	return valPercent;
+}
+
+
+
+//setups the price and percent of a fundraiser
+void setup(double* price, double* percent, const char orgName[]) {
+	
+	//name
+	setName(orgName);
+
+	//setup price
+	*price = setPrice(MIN, MAX);
+
+
+	printf("price In setup: %lf\n", *price);
+
+	*percent = setPercent(MIN_DONATE_PERCENT, MAX_DONATE_PERCENT, orgName);
+
+	printf("percent in setup: %lf\n", *percent);
+
+}//setup
+
+
+
+
+void revisedFund() {
+
+	//setup will need to change a few variables and keep in scope of fundraiser
+	
+	double price = 0;
+	double percent = 0;
+	double* pricePtr = &price;
+	double* percentPtr = &percent;
+	char* orgName[ARRAY_LENGTH] = {""};
+
+
+
+
+
+
+	//price
+	setup(pricePtr, percentPtr, *orgName);
+
+	printf("In revised: %lf\n", price);
+	printf("in revise: %lf\n", percent);
+	
+
+
+
 
 }//fundraiser
