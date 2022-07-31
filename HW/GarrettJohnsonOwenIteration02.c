@@ -33,13 +33,13 @@ char valSizeOrColor(char sizeSelect, int* const indexPtr, const char* array[]);
 bool valString(char* inputStringPtr);
 bool yesNoVal();
 void revisedFund();
-void customerSize();
-void customerColor();
-void setupFundraiser();
-void setup(double* price, double* percent, const char orgName[]);
+int customerSize();
+int customerColor();
+void setup(double* price, double* percent,char orgName[]);
 double setPrice(int min, int max);
 double setPercent(int min, int max, const char orgName[]);
-void setName(char* orgName);
+void setName(char orgName[]);
+void customerPurchasing(double* price, double* percent);
 
 
 
@@ -710,8 +710,9 @@ double setPercent(int min, int max, const char orgName[]) {
 
 
 //setups the price and percent of a fundraiser
-void setup(double* price, double* percent, const char orgName[]) {
+void setup(double* price, double* percent, char orgName[]) {
 	
+
 	//name
 	setName(orgName);
 
@@ -719,15 +720,43 @@ void setup(double* price, double* percent, const char orgName[]) {
 	*price = setPrice(MIN, MAX);
 
 
-	printf("price In setup: %lf\n", *price);
-
 	*percent = setPercent(MIN_DONATE_PERCENT, MAX_DONATE_PERCENT, orgName);
 
-	printf("percent in setup: %lf\n", *percent);
 
 }//setup
 
 
+//gets the customers size and returns the index
+int customerSize() {
+
+
+
+	return 0;
+}
+
+
+//gets the customers color and returns the index
+int customerColor() {
+
+
+
+
+
+	return 0;
+}
+
+
+
+
+
+
+//allows customer to purchase from the fundraiser
+void customerPurchasing(double* price, double* percent) {
+
+
+
+
+}
 
 
 void revisedFund() {
@@ -738,20 +767,15 @@ void revisedFund() {
 	double percent = 0;
 	double* pricePtr = &price;
 	double* percentPtr = &percent;
-	char* orgName[ARRAY_LENGTH] = {""};
+	char orgName[ARRAY_LENGTH] = {""};
 
+	setup(pricePtr, percentPtr, orgName);
 
+	//display all fundraiser info
+	printf("Purchase a t-shirt for $%.2lf and %%%.2lf will be donated to %s.\n", price, percent, orgName);
 
-
-
-
-	//price
-	setup(pricePtr, percentPtr, *orgName);
-
-	printf("In revised: %lf\n", price);
-	printf("in revise: %lf\n", percent);
-	
-
+	//customer purchasing
+	void customerPurchasing();
 
 
 
