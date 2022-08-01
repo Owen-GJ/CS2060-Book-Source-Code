@@ -545,7 +545,7 @@ int customerColor() {
 
 
 void checkout(double price, double percent, const char orgName[], int customerShirtArray[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH]) {
-
+	start
 }
 
 
