@@ -9,10 +9,11 @@
 
 #define ARRAY_LENGTH 80
 #define CORRECT_PASSCODE "b"
+#define ADMIN_QUIT 'q'
 #define SIZE_ARRAY_LENGTH 4
 #define COLOR_ARRAY_LENGTH 4
 const char* SHIRT_SIZE_ARRAY[SIZE_ARRAY_LENGTH] = { "(s)mall", "(m)edium", "(l)arge", "(x)tra-large" };
-enum sizes { SMALL1, MEDIUM, LARGE, EXTRA_LARGE };
+enum sizes { SMALL, MEDIUM, LARGE, EXTRA_LARGE };
 const char* SHIRT_COLOR_ARRAY[SIZE_ARRAY_LENGTH] = { "(w)hite", "(b)lue", "(p)ink", "(k)black" };
 enum colors {WHITE, BLUE, PINK, BLACK};
 #define MIN 10
@@ -25,11 +26,11 @@ void displayRecipt(const char* colorArray[], const char* sizeArray[], const int 
 	double price, int totalShirts, double charityTotalyShirts, char* org, double percent);
 void displaySummary(char* org, double price, double percent, int totalShirts, const char* colorArray[], const char* sizeArray[],
 	const int array[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH]);
-void fundraiser();
 void getString(char* inputStringPtr);
 bool getValidDouble(const char* buff, double* const value, int min, int max);
 long getValidZip();
-char valSizeOrColor(char sizeSelect, int* const indexPtr, const char* array[]);
+int valSize(char sizeSelect, const char* array[]);
+int valColor(char colorSelect, const char* array[]);
 bool valString(char* inputStringPtr);
 bool yesNoVal();
 void revisedFund();
@@ -39,7 +40,7 @@ void setup(double* price, double* percent,char orgName[]);
 double setPrice(int min, int max);
 double setPercent(int min, int max, const char orgName[]);
 void setName(char orgName[]);
-void customerPurchasing(double* price, double* percent);
+bool customerPurchase(double* price, double* percent, int* sizeSelectPtr, int* colorSelectPtr, int totalShirtArray[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH]);
 
 
 
@@ -124,30 +125,47 @@ bool valString(char* inputStringPtr) {
 }//valString
 
 
-//validates if a char was entered that matches a size
-char valSizeOrColor(char sizeSelect, int* const indexPtr, const char* array[]) {
+//validates if a char was entered that matches a size, returns -1 for ADMIN_QUIT, -2 for no proper matches in size, and the index of a size if found.
+int valSize(char sizeSelect, const char* array[]) {
 
-	char charReturn = '\0';
-
+	int returnIndex = -2;
 
 	//Check entered char against the character in parenthesis.
-	int i = 0;
-	while (charReturn == '\0') {
-		if (tolower(sizeSelect) == array[i][1] || tolower(sizeSelect) == 'q') {
+	//go through for each size
+	for (int i = SMALL; i <= EXTRA_LARGE; i++) {
+		
+		if (tolower(sizeSelect) == array[i][1]) {
 
-			charReturn = tolower(sizeSelect);
-			*indexPtr = i;
-		}
-		else if (i == (int)strlen(*array) - 1)
-		{
-			charReturn = EOF;
-		}
-		i++;
-	}
+			returnIndex = i;
 
-	return charReturn;
+		}//found valid
+
+		else if (towlower(sizeSelect) == ADMIN_QUIT) {
+			returnIndex = -1;
+		}
+
+	}//go through each size
+
+	return returnIndex;
 
 }//valSize
+
+
+
+int valColor(char colorSelect, const char* array[]) {
+	int returnIndex = -1;
+
+	//Check entered char against the character in parenthesis.
+	//go through for each color
+	for (int i = WHITE; i <= BLACK; i++) {
+		if (tolower(colorSelect) == array[i][1]) {
+			returnIndex = i;
+		}
+	}
+
+
+	return returnIndex;
+}//ValColor
 
 
 
@@ -319,293 +337,6 @@ void displayRecipt(const char* colorArray[], const char* sizeArray[], const int 
 
 
 
-void fundraiser() {
-
-	//*************************************
-	//Setting up fundraiser
-	//*************************************
-
-	//getting name
-	puts("Enter fundraiser orginization's name");
-
-	char orgName[ARRAY_LENGTH];
-	getString(orgName);
-
-	//getting price and validating it
-	//setup
-	char userPrice[ARRAY_LENGTH];
-	printf("Enter sales price of t-shirts between %d and %d\n", MIN, MAX);
-	getString(userPrice);
-
-	double valPrice = 0;
-	double* const valPricePtr = &valPrice;
-
-	//recieving input and validate
-	bool correctRange = false;
-	do {
-		//validating
-		while (!getValidDouble(userPrice, valPricePtr, MIN, MAX)) {
-			printf("Enter a value between %d and %d\n", MIN, MAX);
-			getString(userPrice);
-		}
-
-		//confirm
-		printf("Is $%.2lf correct? Enter Y/y for yes; N/n for no.\n", valPrice);
-		bool yOrNo = yesNoVal();
-		if (yOrNo) {
-			correctRange = true;
-		}
-
-		else if (!yOrNo) {
-			printf("Enter a value between %d and %d\n", MIN, MAX);
-			getString(userPrice);
-		}
-
-
-	} while (!correctRange); // a valid price has been recieved and the user has said that it works
-
-	//settup charity percent amount
-	printf("Enter percentage of the t-shirt sales between %%%d and %%%d that will be donated to %s\n", MIN_DONATE_PERCENT, MAX_DONATE_PERCENT, orgName);
-	char userPercent[ARRAY_LENGTH];
-	getString(userPercent);
-
-	double valPercent = 0;
-	double* const valPercentPtr = &valPercent;
-
-
-	correctRange = false;
-
-
-	//2D array to store how many of each shirt was bought.
-	int totalShirtArray[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH] = { 0 };
-
-
-	do {
-
-		//validate
-		while (!getValidDouble(userPercent, valPercentPtr, MIN_DONATE_PERCENT, MAX_DONATE_PERCENT)) {
-			printf("Enter percentage of the t-shirt sales between %%%d and %%%d that will be donated to %s\n", MIN_DONATE_PERCENT, MAX_DONATE_PERCENT, orgName);
-			getString(userPercent);
-		}
-
-		//confirm
-		printf("Is %%%.2lf correct? Enter Y/y for yes; N/n for no.\n", valPercent);
-		bool yOrNo = yesNoVal();
-		if (yOrNo) {
-			correctRange = true;
-		}
-
-		else if (!yOrNo) {
-			printf("Enter percentage of the t-shirt sales between %%%d and %%%d that will be donated to %s\n", MIN_DONATE_PERCENT, MAX_DONATE_PERCENT, orgName);
-			getString(userPercent);
-		}
-
-
-	} while (!correctRange);
-
-	//display information about fundraiser
-	printf("Purchase a t-shirt for $%.2lf and %%%.2lf will be donated to %s.\n", valPrice, valPercent, orgName);
-
-
-	//******************************************
-	//Customer Purchasing
-	//******************************************
-
-	//used for searching for admin shutdown if not shutdown, then continue selling
-
-
-	//used for more customer status, if admin shutdown this turns false
-	bool moreCustomers = true;
-
-	//used to keep track of all shirt sales
-	int totalCharityShirts = 0;
-
-
-	while (moreCustomers) {
-
-		//used for searching for admin shutdown if not shutdown, then continue selling
-		bool shutdown = false;
-
-		//used for each sale
-		int salesShirtArray[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH] = { 0 };
-
-		//create space between last customer or admin setup
-		puts("\n\n\n");
-
-
-
-		int totalSalesShirts = 0;
-		bool customerContinue = true;
-		while (customerContinue) {
-			//getting size and validating it
-			printf("Select your shirt size by entering the character in parentheses:\n%s, %s, %s, %s\n", SHIRT_SIZE_ARRAY[0], SHIRT_SIZE_ARRAY[1],
-				SHIRT_SIZE_ARRAY[2], SHIRT_SIZE_ARRAY[3]);
-			char selectSize = getchar();
-			while (getchar() != '\n');
-
-			//used to return index
-			int sizeIndex;
-			int* sizeIndexPtr = &sizeIndex;
-
-			selectSize = valSizeOrColor(selectSize, sizeIndexPtr, SHIRT_SIZE_ARRAY);
-
-
-			while (selectSize == EOF) {
-
-				puts("Error: You did not enter a valid choice");
-				printf("Select your shirt size by entering the character in parentheses:\n%s, %s, %s, %s\n", SHIRT_SIZE_ARRAY[0], SHIRT_SIZE_ARRAY[1],
-					SHIRT_SIZE_ARRAY[2], SHIRT_SIZE_ARRAY[3]);
-				selectSize = getchar();
-				while (getchar() != '\n');
-				selectSize = valSizeOrColor(selectSize, sizeIndexPtr, SHIRT_SIZE_ARRAY);
-			}//while
-
-
-
-			if (selectSize == 'q') {
-
-				//this shows an attempt was made
-				shutdown = true;
-				customerContinue = false;
-
-				int attempt = 0;
-				while (attempt < NUMBER_OF_ATTEMPTS) {
-					//getting passcode and validating it
-					char inPasscode[ARRAY_LENGTH];
-					puts("Enter passcode");
-					getString(inPasscode);
-					bool correctPasscode = valString(inPasscode);
-
-
-					if (correctPasscode) {
-						puts("\n");
-						displaySummary(orgName, valPrice, valPercent, totalCharityShirts, SHIRT_COLOR_ARRAY, SHIRT_SIZE_ARRAY, totalShirtArray);
-
-						attempt = NUMBER_OF_ATTEMPTS;
-						moreCustomers = false;
-
-
-					}//if true
-
-
-					else if (!correctPasscode) {
-
-						puts("Error: The password is incorrect");
-						attempt++;
-					}//if false
-
-					if (!correctPasscode && attempt == NUMBER_OF_ATTEMPTS) {
-						puts("Returning to sales mode, current sale has been restarted.");
-					}//if
-
-				}// while attempt < num
-
-
-			}//if( size == q)
-
-
-
-			if (!shutdown) {
-
-
-
-				printf("%s was selected\n", SHIRT_SIZE_ARRAY[sizeIndex]);
-
-
-
-
-
-
-
-				//getting color and validating it
-				printf("Select your shirt color by entering the character in parentheses:\n%s, %s, %s, %s\n", SHIRT_COLOR_ARRAY[0], SHIRT_COLOR_ARRAY[1],
-					SHIRT_COLOR_ARRAY[2], SHIRT_COLOR_ARRAY[3]);
-				char selectColor = getchar();
-				while (getchar() != '\n');
-
-				//used to return index
-				int colorIndex;
-				int* colorIndexPtr = &colorIndex;
-
-				selectColor = valSizeOrColor(selectColor, colorIndexPtr, SHIRT_COLOR_ARRAY);
-
-				while (selectColor == EOF || selectColor == 'q') {
-
-					puts("Error: You did not enter a valid choice");
-					printf("Select your shirt color by entering the character in parentheses:\n%s, %s, %s, %s\n", SHIRT_COLOR_ARRAY[0], SHIRT_COLOR_ARRAY[1],
-						SHIRT_COLOR_ARRAY[2], SHIRT_COLOR_ARRAY[3]);
-					selectColor = getchar();
-					while (getchar() != '\n');
-					selectColor = valSizeOrColor(selectColor, colorIndexPtr, SHIRT_COLOR_ARRAY);
-				}//while
-
-				printf("%s was selected\n", SHIRT_COLOR_ARRAY[colorIndex]);
-
-
-
-
-
-				//add shirt into sales array and totalArray
-				salesShirtArray[sizeIndex][colorIndex]++;
-
-				//See if customer want another shirt
-				puts("Do you want to purchase another shirt? Enter Y/y for yes; N/n for no.");
-				bool yOrNo = yesNoVal();
-				if (!yOrNo) {
-					customerContinue = false;
-				}
-
-				totalSalesShirts++;
-
-
-			}//if(!shutdown)
-
-		}//while(customsercontinue)
-
-
-		//don't show recipt options if admin initiates shutdown
-		if (!shutdown) {
-
-			long zipCode = getValidZip();
-			printf("Zip Code: %ld\n", zipCode);
-
-
-			puts("Do you want a recipt? Enter Y/y for yes; N/n for no.");
-			bool yOrNo = yesNoVal();
-			if (yOrNo) {
-				puts("\n");
-				displayRecipt(SHIRT_COLOR_ARRAY, SHIRT_SIZE_ARRAY, salesShirtArray, valPrice, totalSalesShirts, totalCharityShirts, orgName, valPercent);
-			}
-			else {
-				puts("\n");
-				printf("Thank you for supporting %s. $%.2lf of your purchase will be donated.\n$%.2lf has been raised so far", orgName,
-					((valPercent / 100) * (totalSalesShirts * valPrice)), (valPercent / 100) * ((totalCharityShirts + totalSalesShirts) * valPrice));
-			}
-
-			totalCharityShirts += totalSalesShirts;
-
-			//adds all of the shirts that have been purchased to totalcharity shirts array
-			for (int row = 0; row < SIZE_ARRAY_LENGTH; row++) {
-				for (int column = 0; column < COLOR_ARRAY_LENGTH; column++) {
-
-					totalShirtArray[row][column] += salesShirtArray[row][column];
-
-				}
-			}
-
-
-
-
-
-
-		}//if(!shutdonw)
-		//end of while for checking for Q
-
-	}//while(morecustomers)
-
-}//fundraiser
-
-
 //sets the organization name
 void setName(char orgName[]) {
 
@@ -729,32 +460,143 @@ void setup(double* price, double* percent, char orgName[]) {
 //gets the customers size and returns the index
 int customerSize() {
 
+	bool sizeIsValid = false;
+	int returnIndex = 0;
+
+	while (!sizeIsValid) {
+		//ask for size
+		puts("Select your shirt size by entering the character in parentheses: ");
+		//display each option
+		for (int i = SMALL; i <= EXTRA_LARGE; i++) {
+
+			//used for formating
+			if (i != EXTRA_LARGE) {
+				printf("%s, ", SHIRT_SIZE_ARRAY[i]);
+			}//if
+			else if (i == EXTRA_LARGE) {
+				printf("%s\n", SHIRT_SIZE_ARRAY[i]);
+			}
+		}//display each option
+
+		//get selection
+		char sizeSelect = getchar();
+		while (getchar() != '\n');
+		returnIndex = valSize(sizeSelect, SHIRT_SIZE_ARRAY);
+
+		if (returnIndex == -2) {
+			puts("Error: You did not enter a valid choice\n");
+
+		}//==-2
+
+		else {
+			sizeIsValid = true;
+		}
 
 
-	return 0;
+	}//while !valSize
+
+
+	return returnIndex;
 }
 
 
 //gets the customers color and returns the index
 int customerColor() {
+	bool isValid = false;
+	int returnIndex = 0;
 
+	while (!isValid) {
+		//ask for color
+		puts("Select your shirt color by entering the character in parentheses: ");
 
+		//display each option
+		for (int i = WHITE; i <= BLACK; i++) {
 
+			//used for formating
+			if (i != BLACK) {
+				printf("%s, ", SHIRT_COLOR_ARRAY[i]);
+			}//if
+			else if (i == BLACK) {
+				printf("%s\n", SHIRT_COLOR_ARRAY[i]);
+			}
+		}//display each option
 
+		char colorSelect = getchar();
+		while (getchar() != '\n');
+		returnIndex = valColor(colorSelect, SHIRT_COLOR_ARRAY);
 
-	return 0;
+		//not valid 
+		if (returnIndex == -1) {
+
+			puts("Error: you did not enter a valid choice\n");
+
+		}//not valid
+
+		//leave loop
+		else {
+			isValid = true;
+		}
+
+	}//while !isValid
+
+	return returnIndex;
 }
 
 
 
 
-
-
 //allows customer to purchase from the fundraiser
-void customerPurchasing(double* price, double* percent) {
+bool customerPurchase(double* price, double* percent, int* sizeSelectPtr, int* colorSelectPtr, int totalShirtArray[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH]) {
+
+	//used for admin shutdown, when ADMIN_QUIT it will make the function return false, otherwise it will return true.
+	bool anotherCustomer = true;
+
+
+	while (anotherCustomer) {
+
+		//get size and color indexes
+		*sizeSelectPtr = customerSize();
+
+		//don't continue purchasing if ADMIN_QUIT is entered.
+		if (*sizeSelectPtr != -2) {
+
+			//used to purchase more shirts
+			bool continuePurchasing = true;
+			while (continuePurchasing) {
+
+				printf("%s selected\n", SHIRT_SIZE_ARRAY[*sizeSelectPtr]);
+
+
+				*colorSelectPtr = customerColor();
+				printf("%s selected\n", SHIRT_COLOR_ARRAY[*colorSelectPtr]);
 
 
 
+
+
+
+				//See if customer want another shirt
+				puts("Do you want to purchase another shirt? Enter Y/y for yes; N/n for no.");
+				bool yOrNo = yesNoVal();
+				if (!yOrNo) {
+					continuePurchasing = false;
+				}
+
+			}//continuePurchasing
+
+
+
+
+
+
+		}// != ADMIN_QUIT
+
+		//else make anotherCustomer false so that admin shutdown starts
+		else {
+			anotherCustomer = false;
+		}
+
+	}//anotherCustomer
 
 }
 
@@ -774,9 +616,16 @@ void revisedFund() {
 	//display all fundraiser info
 	printf("Purchase a t-shirt for $%.2lf and %%%.2lf will be donated to %s.\n", price, percent, orgName);
 
-	//customer purchasing
-	void customerPurchasing();
+	//customer purchasing, need new pointers for size and color indexes
+	int sizeSelect = 0;
+	int colorSelect = 0;
+	int* sizeSelectPtr = &sizeSelect;
+	int* colorSelectPtr = &colorSelect;
+	//need 2D array to keep track of all shirt sales
+	int totalShirtArray[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH] = { 0 };
 
+
+	while(customerPurchase(pricePtr, percentPtr, sizeSelectPtr, colorSelectPtr, totalShirtArray));
 
 
 }//fundraiser
