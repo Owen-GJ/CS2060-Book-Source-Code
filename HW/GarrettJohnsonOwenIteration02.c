@@ -22,10 +22,10 @@ enum colors {WHITE, BLUE, PINK, BLACK};
 #define MIN_DONATE_PERCENT 5
 #define MAX_DONATE_PERCENT 30
 
-void displayRecipt(const char* colorArray[], const char* sizeArray[], const int array[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH],
-	double price, int totalShirts, double charityTotalyShirts, char* org, double percent);
-void displaySummary(char* org, double price, double percent, int totalShirts, const char* colorArray[], const char* sizeArray[],
-	const int array[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH]);
+void displayRecipt(const char* colorArray[], const char* sizeArray[], const int customerArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH],
+	double price, const char* org, double percent, int charityArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH]);
+void displaySummary(char* org, double price, double percent, const char* colorArray[], const char* sizeArray[],
+	const int array[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH]);
 void getString(char* inputStringPtr);
 bool getValidDouble(const char* buff, double* const value, int min, int max);
 long getValidZip();
@@ -40,8 +40,9 @@ void setup(double* price, double* percent,char orgName[]);
 double setPrice(int min, int max);
 double setPercent(int min, int max, const char orgName[]);
 void setName(char orgName[]);
-bool customerPurchase(double price, double percent, const char orgName[], int totalShirtArray[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH]);
-void checkout(double price, double percent, const char orgName[], int customerShirtArray[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH]);
+bool customerPurchase(double price, double percent, const char orgName[], int totalShirtArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH]);
+void checkout(double price, double percent, const char orgName[], int customerShirtArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH],
+	int charityArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH]);
 
 
 int main(void) {
@@ -274,8 +275,20 @@ bool getValidDouble(const char* buff, double* const value, int min, int max) {
 }
 
 
-void displaySummary(char* org, double price, double percent, int totalShirts, const char* colorArray[], const char* sizeArray[],
-	const int array[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH]) {
+void displaySummary(char* org, double price, double percent, const char* colorArray[], const char* sizeArray[],
+	const int array[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH]) {
+
+	int totalShirts = 0;
+
+	//calculate total shirts
+	for (size_t color = 0; color < COLOR_ARRAY_LENGTH; color++) {
+		for (size_t size = 0; size < SIZE_ARRAY_LENGTH; size++) {
+			totalShirts += array[color][size];
+		}
+	}
+
+
+
 
 	printf("Organization: %s\nT-Shirt purchases\n", org);
 
@@ -313,14 +326,31 @@ void displaySummary(char* org, double price, double percent, int totalShirts, co
 }//displayRecipt
 
 
-void displayRecipt(const char* colorArray[], const char* sizeArray[], const int array[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH],
-	double price, int totalShirts, double charityTotalyShirts, char* org, double percent) {
+void displayRecipt(const char* colorArray[], const char* sizeArray[], const int customerArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH],
+	double price, const char* org, double percent, int charityArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH]) {
+	int customerTotalShirts = 0;
+	int charityTotalShirts = 0;
+
+
+	//calculate customer total shirts and adding to charityArray
+	for (size_t color = 0; color < COLOR_ARRAY_LENGTH; color++) {
+		for (size_t size = 0; size < SIZE_ARRAY_LENGTH; size++) {
+			customerTotalShirts += customerArray[color][size];
+			charityArray[color][size] += customerArray[color][size];
+			charityTotalShirts += charityArray[color][size];
+		}
+	}
+
+
+
+
+
 
 	//prints out all the shirts
 	for (size_t color = 0; color < COLOR_ARRAY_LENGTH; color++) {
 		for (size_t size = 0; size < SIZE_ARRAY_LENGTH; size++) {
 
-			for (int i = 0; i < array[color][size]; i++) {
+			for (int i = 0; i < customerArray[color][size]; i++) {
 				printf("%s %s tshirt: $%.2lf\n", sizeArray[size], colorArray[color], price);
 			}
 
@@ -330,9 +360,9 @@ void displayRecipt(const char* colorArray[], const char* sizeArray[], const int 
 	}//color
 
 	//print total, and ending message
-	printf("Total Charge: $%.2lf\n", (totalShirts * price));
-	printf("Thank you for supporting %s.\n%%%.2lf will be donated to charity.\n$%.2lf has been raised so far", org, percent,
-		((percent / 100) * ((charityTotalyShirts + totalShirts) * price)));
+	printf("Total Charge: $%.2lf\n", (customerTotalShirts * price));
+	printf("Thank you for supporting %s.\n$%.2lf will be donated to charity.\n$%.2lf has been raised so far", org, ((percent / 100) * customerTotalShirts * price),
+		((percent / 100) * ((charityTotalShirts) * price)));
 }
 
 
@@ -543,16 +573,30 @@ int customerColor() {
 }
 
 
+//recieves payment and prints recipt for customer
+void checkout(double price, double percent, const char orgName[], int customerShirtArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH],
+												int charityArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH]) {
+	//get zipcode
+	long zipCode = getValidZip();
+	printf("Zip Code: %ld\n", zipCode);
 
-void checkout(double price, double percent, const char orgName[], int customerShirtArray[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH]) {
-	start
+	puts("Do you want a recipt? Enter Y/y for yes; N/n for no.");
+	bool yOrNo = yesNoVal();
+	if (yOrNo) {
+		puts("\n");
+		displayRecipt(SHIRT_COLOR_ARRAY, SHIRT_SIZE_ARRAY, customerShirtArray, price, orgName, percent, charityArray);
+	}
+
+
+
+	
 }
 
 
 
 
 //allows customer to purchase from the fundraiser
-bool customerPurchase(double price, double percent, const char orgName[], int totalShirtArray[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH]) {
+bool customerPurchase(double price, double percent, const char orgName[], int totalShirtArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH]) {
 	//customer purchasing, need new pointers for size and color indexes
 
 	int sizeSelect = 0;
@@ -564,7 +608,7 @@ bool customerPurchase(double price, double percent, const char orgName[], int to
 	while (anotherCustomer) {
 
 		//local shirt array for recipt purposes and total shirt book keeping. It is recreated for every customer.
-		int customerShirtArray[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH] = { 0 };
+		int customerShirtArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH] = { 0 };
 
 		bool continuePurchasing = true;
 		while (continuePurchasing) {
@@ -586,7 +630,7 @@ bool customerPurchase(double price, double percent, const char orgName[], int to
 
 
 				//add shirt to localShirt array, don't add to totalShirtArray until purchase is finalized.
-				customerShirtArray[sizeSelect][colorSelect]++;
+				customerShirtArray[colorSelect][sizeSelect]++;
 
 
 
@@ -595,6 +639,10 @@ bool customerPurchase(double price, double percent, const char orgName[], int to
 				bool yOrNo = yesNoVal();
 				if (!yOrNo) {
 					continuePurchasing = false;
+
+
+					checkout(price, percent, orgName, customerShirtArray, totalShirtArray);
+
 				}
 
 
@@ -620,12 +668,12 @@ bool customerPurchase(double price, double percent, const char orgName[], int to
 void revisedFund() {
 
 	//setup will need to change a few variables and keep in scope of fundraiser
-	
+
 	double price = 0;
 	double percent = 0;
 	double* pricePtr = &price;
 	double* percentPtr = &percent;
-	char orgName[ARRAY_LENGTH] = {""};
+	char orgName[ARRAY_LENGTH] = { "" };
 
 	setup(pricePtr, percentPtr, orgName);
 
@@ -634,10 +682,47 @@ void revisedFund() {
 
 
 	//need 2D array to keep track of all shirt sales
-	int totalShirtArray[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH] = { 0 };
+	int totalShirtArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH] = { 0 };
 
 
-	while(customerPurchase(price, percent, totalShirtArray));
+	//sentinel for if admin shutdown
+	bool shutdown = false;
+	while (!shutdown) {
+		while(customerPurchase(price, percent, orgName, totalShirtArray));
+		
+
+		//attempt to go into admin shutdown
+		//validting password
+		int attempt = 0;
+
+		while (attempt < NUMBER_OF_ATTEMPTS) {
+			//getting passcode and validating it
+			char inPasscode[ARRAY_LENGTH];
+			puts("Enter passcode");
+			getString(inPasscode);
+			bool correctPasscode = valString(inPasscode);
+
+			if (correctPasscode) {
+
+				displaySummary(orgName, price, percent, SHIRT_COLOR_ARRAY, SHIRT_SIZE_ARRAY, totalShirtArray);
+				shutdown = true;
+				attempt = NUMBER_OF_ATTEMPTS;
+			}//if true
+
+
+			else if (!correctPasscode) {
+
+				puts("Error: The password is incorrect");
+				attempt++;
+			}//if false
+
+			if (!correctPasscode && attempt == NUMBER_OF_ATTEMPTS) {
+				puts("Exiting admin shutdown");
+			}
+
+		}//while attempt < NUMBER_OF_ATTEMPTS
+
+	}//While !shutdown
 
 
 }//fundraiser
