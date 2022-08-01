@@ -40,8 +40,8 @@ void setup(double* price, double* percent,char orgName[]);
 double setPrice(int min, int max);
 double setPercent(int min, int max, const char orgName[]);
 void setName(char orgName[]);
-bool customerPurchase(double* price, double* percent, int* sizeSelectPtr, int* colorSelectPtr, int totalShirtArray[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH]);
-
+bool customerPurchase(double price, double percent, const char orgName[], int totalShirtArray[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH]);
+void checkout(double price, double percent, const char orgName[], int customerShirtArray[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH]);
 
 
 int main(void) {
@@ -544,34 +544,49 @@ int customerColor() {
 
 
 
+void checkout(double price, double percent, const char orgName[], int customerShirtArray[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH]) {
+
+}
+
+
+
 
 //allows customer to purchase from the fundraiser
-bool customerPurchase(double* price, double* percent, int* sizeSelectPtr, int* colorSelectPtr, int totalShirtArray[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH]) {
+bool customerPurchase(double price, double percent, const char orgName[], int totalShirtArray[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH]) {
+	//customer purchasing, need new pointers for size and color indexes
+
+	int sizeSelect = 0;
+	int colorSelect = 0;
+
 
 	//used for admin shutdown, when ADMIN_QUIT it will make the function return false, otherwise it will return true.
 	bool anotherCustomer = true;
-
-
 	while (anotherCustomer) {
 
-		//get size and color indexes
-		*sizeSelectPtr = customerSize();
+		//local shirt array for recipt purposes and total shirt book keeping. It is recreated for every customer.
+		int customerShirtArray[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH] = { 0 };
 
-		//don't continue purchasing if ADMIN_QUIT is entered.
-		if (*sizeSelectPtr != -2) {
+		bool continuePurchasing = true;
+		while (continuePurchasing) {
 
-			//used to purchase more shirts
-			bool continuePurchasing = true;
-			while (continuePurchasing) {
-
-				printf("%s selected\n", SHIRT_SIZE_ARRAY[*sizeSelectPtr]);
-
-
-				*colorSelectPtr = customerColor();
-				printf("%s selected\n", SHIRT_COLOR_ARRAY[*colorSelectPtr]);
+			//get size and color indexes
+			sizeSelect = customerSize();
 
 
 
+			//don't continue purchasing if ADMIN_QUIT is entered.
+			if (sizeSelect != -1) {
+
+
+				printf("%s selected\n", SHIRT_SIZE_ARRAY[sizeSelect]);
+
+
+				colorSelect = customerColor();
+				printf("%s selected\n", SHIRT_COLOR_ARRAY[colorSelect]);
+
+
+				//add shirt to localShirt array, don't add to totalShirtArray until purchase is finalized.
+				customerShirtArray[sizeSelect][colorSelect]++;
 
 
 
@@ -582,22 +597,23 @@ bool customerPurchase(double* price, double* percent, int* sizeSelectPtr, int* c
 					continuePurchasing = false;
 				}
 
-			}//continuePurchasing
 
 
 
 
 
+			}// != ADMIN_QUIT
 
-		}// != ADMIN_QUIT
+			//else make anotherCustomer false so that admin shutdown starts
+			else {
+				anotherCustomer = false;
+				continuePurchasing = false;
+			}
 
-		//else make anotherCustomer false so that admin shutdown starts
-		else {
-			anotherCustomer = false;
-		}
+		}//continuePurchasing
 
 	}//anotherCustomer
-
+	return anotherCustomer;
 }
 
 
@@ -616,16 +632,12 @@ void revisedFund() {
 	//display all fundraiser info
 	printf("Purchase a t-shirt for $%.2lf and %%%.2lf will be donated to %s.\n", price, percent, orgName);
 
-	//customer purchasing, need new pointers for size and color indexes
-	int sizeSelect = 0;
-	int colorSelect = 0;
-	int* sizeSelectPtr = &sizeSelect;
-	int* colorSelectPtr = &colorSelect;
+
 	//need 2D array to keep track of all shirt sales
 	int totalShirtArray[SIZE_ARRAY_LENGTH][COLOR_ARRAY_LENGTH] = { 0 };
 
 
-	while(customerPurchase(pricePtr, percentPtr, sizeSelectPtr, colorSelectPtr, totalShirtArray));
+	while(customerPurchase(price, percent, totalShirtArray));
 
 
 }//fundraiser
