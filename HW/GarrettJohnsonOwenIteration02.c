@@ -7,6 +7,9 @@
 #include <float.h>
 #include <errno.h>
 
+
+
+const char* FILE_PATH = {"C:/Users/TheBird/Desktop/T-Shirt Iteration 02 File Directory"};
 #define ARRAY_LENGTH 80
 #define CORRECT_PASSCODE "b"
 #define ADMIN_QUIT 'q'
@@ -49,7 +52,7 @@ bool yesNoVal();
 void fundraiser();
 int customerSize();
 int customerColor();
-void setup(double* price, double* percent,char orgName[]);
+void setup(OrgNode** headPtr);
 double setPrice(int min, int max);
 double setPercent(int min, int max, const char orgName[]);
 void setName(char orgName[]);
@@ -58,7 +61,7 @@ void checkout(double price, double percent, const char orgName[], int customerSh
 	int charityArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH]);
 void addOrgNode(OrgNode** headPtr, const char* orgName, double price, double percent);
 OrgNode* getOrgNode(OrgNode** headPtr, const char* orgName);
-
+void writeSummariesToFiles(OrgNode** headPtr, const char* colorArray[], const char* sizeArray[]);
 
 
 
@@ -96,7 +99,7 @@ int main(void) {
 
 }
 
-//appends a new OrgNode to the end of the linked list given the head of the list
+//places a new orgNode alphabetically into the linked list with given headPtr
 void addOrgNode(OrgNode** headPtr, const char* orgName, double price, double percent) {
 	//create memory for node and add pointer
 	OrgNode* newOrgPtr = malloc(sizeof(OrgNode));
@@ -124,7 +127,7 @@ void addOrgNode(OrgNode** headPtr, const char* orgName, double price, double per
 		OrgNode* currentPtr = *headPtr;
 		OrgNode* previousPtr = NULL;
 		
-		while (currentPtr != NULL) {
+		while (currentPtr != NULL && strcmp(orgName, currentPtr->orgName) >= 0) {
 
 			//go to next Pointer until null is found
 			previousPtr = currentPtr;
@@ -139,11 +142,13 @@ void addOrgNode(OrgNode** headPtr, const char* orgName, double price, double per
 		}//make head
 
 
-		//found end of list, so add orgNode to end of list
+		//found place in list, insert node
 		else {
-			previousPtr->nextPtr = currentPtr;
+			previousPtr->nextPtr = newOrgPtr;
 		}//add orgNode to end of List
 		
+		//make new orgNode point to next node
+		newOrgPtr->nextPtr = currentPtr;
 
 
 	}// != NULL
@@ -154,6 +159,7 @@ void addOrgNode(OrgNode** headPtr, const char* orgName, double price, double per
 	
 }//addOrgNode
 
+//return pointer to node that has the same name as the one given
 OrgNode* getOrgNode(OrgNode** headPtr, const char* orgName) {
 
 	//used for finding and returning a node
@@ -176,6 +182,78 @@ OrgNode* getOrgNode(OrgNode** headPtr, const char* orgName) {
 
 	return returnNode;
 }//getOrgNode
+
+//writes summaries of nodes past and including the node given, also frees the memory of each node.
+void writeSummariesToFiles(OrgNode** headPtr, const char* colorArray[], const char* sizeArray[]) {
+	//used to traverse the list
+	OrgNode* currentNode = *headPtr;
+	OrgNode* next = NULL;
+
+	while (currentNode != NULL) {
+		//create filePtr and open/create file for writing
+		FILE* filePtr;
+
+
+		//couldn't open file
+		if ((filePtr = fopen(strcat(FILE_PATH, strcat(currentNode->orgName, ".txt")), "w")) == NULL) {
+			printf("File for %s could not be opened", currentNode->orgName);
+		}//coudn't open
+
+		//opened file succesfully
+		else {
+
+			int totalShirts = 0;
+
+			//calculate total shirts
+			for (size_t color = 0; color < COLOR_ARRAY_LENGTH; color++) {
+				for (size_t size = 0; size < SIZE_ARRAY_LENGTH; size++) {
+					totalShirts += currentNode->orgTotalShirts[color][size];
+				}
+			}//calculate total shirts
+
+			fprintf(filePtr, "Organization: %s\nT-Shirt purchases\n", currentNode->orgName);
+
+			for (size_t color = 0; color < COLOR_ARRAY_LENGTH; color++) {
+
+
+				for (size_t size = 0; size < SIZE_ARRAY_LENGTH; size++) {
+
+					//prints header for size
+					if (color == 0 && size == 0) {
+						fprintf(filePtr, "%-9s\t", "");
+						for (size_t i = 0; i < SIZE_ARRAY_LENGTH; i++) {
+							fprintf(filePtr, "%-9s\t", sizeArray[i]);
+						}
+						fputs("", filePtr);
+					}
+
+					//prints body
+
+
+					if (size == 0) {
+						fprintf(filePtr, "%-9s\t", colorArray[color]);
+					}
+					fprintf(filePtr, "%-9d\t", currentNode->orgTotalShirts[color][size]);
+
+				}//for size
+				fputs("", filePtr);
+			}//for color
+
+			fprintf(filePtr, "Total shirts sold: %d\nTotal Sales: %.2lf\nFundraiser Percentage: %%%.2lf\nTotal Funds Raised: $%.2lf",
+				totalShirts, (totalShirts * currentNode->price), currentNode->percent, (currentNode->percent / 100) * (totalShirts * currentNode->price));
+
+
+
+		}//opened file succesfully
+
+
+
+	}//While currentNOde != NULL
+
+
+
+
+}//writeSummariestoFiles
 
 
 
@@ -386,7 +464,6 @@ void displaySummary(char* org, double price, double percent, const char* colorAr
 
 
 
-
 	printf("Organization: %s\nT-Shirt purchases\n", org);
 
 	for (size_t color = 0; color < COLOR_ARRAY_LENGTH; color++) {
@@ -415,7 +492,7 @@ void displaySummary(char* org, double price, double percent, const char* colorAr
 		puts("");
 	}//for color
 
-	printf("Total shirt sold: %d\nTotal Sales: %.2lf\nFundraiser Percentage: %%%.2lf\nTotal Funds Raised: $%.2lf",
+	printf("Total shirts sold: %d\nTotal Sales: %.2lf\nFundraiser Percentage: %%%.2lf\nTotal Funds Raised: $%.2lf",
 		totalShirts, (totalShirts * price), percent, (percent / 100) * (totalShirts * price));
 
 
@@ -581,18 +658,33 @@ double setPercent(int min, int max, const char orgName[]) {
 
 
 //setups the price and percent of a fundraiser
-void setup(double* price, double* percent, char orgName[]) {
+void setup(OrgNode** headPtr) {
 	
+	bool addAnother = true;
 
-	//name
-	setName(orgName);
+	while (addAnother) {
 
-	//setup price
-	*price = setPrice(PRICE_MIN, PRICE_MAX);
+		//name
+		char* orgName[] = { '\0' };
+
+		setName(orgName);
+
+		//setup price
+		double price = setPrice(PRICE_MIN, PRICE_MAX);
 
 
-	*percent = setPercent(MIN_DONATE_PERCENT, MAX_DONATE_PERCENT, orgName);
+		double percent = setPercent(MIN_DONATE_PERCENT, MAX_DONATE_PERCENT, orgName);
 
+		addOrgNode(&headPtr, orgName, price, percent);
+
+
+		puts("Would you like to add another organization? Enter Y/y for yes; N/n for no.");
+		if (!yesNoVal()) {
+			addAnother = false;
+		}// y/n val
+
+
+	}//while addAnother
 
 }//setup
 
@@ -773,18 +865,14 @@ bool customerPurchase(double price, double percent, const char orgName[], int to
 
 void fundraiser() {
 
-	//setup will need to change a few variables and keep in scope of fundraiser
+	//setup will only need a head ptr that we keep in fundraiser
 
-	double price = 0;
-	double percent = 0;
-	double* pricePtr = &price;
-	double* percentPtr = &percent;
-	char orgName[ARRAY_LENGTH] = { "" };
+	OrgNode* headPtr = NULL;
 
-	setup(pricePtr, percentPtr, orgName);
+	setup(&headPtr);
 
 	//display all fundraiser info
-	printf("Purchase a t-shirt for $%.2lf and %%%.2lf will be donated to %s.\n\n\n", price, percent, orgName);
+	//printf("Purchase a t-shirt for $%.2lf and %%%.2lf will be donated to %s.\n\n\n", price, percent, orgName);
 
 
 	//need 2D array to keep track of all shirt sales
