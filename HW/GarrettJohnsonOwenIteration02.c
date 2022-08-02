@@ -22,6 +22,19 @@ enum colors {WHITE, BLUE, RED, PINK, BLACK};
 #define MIN_DONATE_PERCENT 10
 #define MAX_DONATE_PERCENT 25
 
+//stuct that holds information about a fundraiser organization
+typedef struct orgNode {
+
+	char orgName[ARRAY_LENGTH];
+	double price;
+	double percent;
+	int orgTotalShirts[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH];
+	struct orgNode* nextPtr;
+
+}OrgNode;
+
+
+
 void displayRecipt(const char* colorArray[], const char* sizeArray[], const int customerArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH],
 	double price, const char* org, double percent, int charityArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH], bool yOrNo);
 void displaySummary(char* org, double price, double percent, const char* colorArray[], const char* sizeArray[],
@@ -43,17 +56,10 @@ void setName(char orgName[]);
 bool customerPurchase(double price, double percent, const char orgName[], int totalShirtArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH]);
 void checkout(double price, double percent, const char orgName[], int customerShirtArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH],
 	int charityArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH]);
+void addOrgNode(OrgNode** headPtr, const char* orgName, double price, double percent);
+OrgNode* getOrgNode(OrgNode** headPtr, const char* orgName);
 
-//stuct that holds information about a fundraiser organization
-typedef struct orgNode {
 
-	char orgName[ARRAY_LENGTH];
-	double price;
-	double percent;
-	int orgTotalShirts[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH];
-	struct orgNode* next;
-
-}orgNode;
 
 
 int main(void) {
@@ -90,6 +96,86 @@ int main(void) {
 
 }
 
+//appends a new OrgNode to the end of the linked list given the head of the list
+void addOrgNode(OrgNode** headPtr, const char* orgName, double price, double percent) {
+	//create memory for node and add pointer
+	OrgNode* newOrgPtr = malloc(sizeof(OrgNode));
+
+	//check pointer didn't return null, then setup new node
+	if (newOrgPtr != NULL) {
+		strncpy(newOrgPtr->orgName, orgName, ARRAY_LENGTH);
+		newOrgPtr->price = price;
+		newOrgPtr->percent = percent;
+		
+		//fill orgTotalShirts
+		for (int colors = 0; colors < COLOR_ARRAY_LENGTH; colors++) {
+			for (int size = 0; size < SIZE_ARRAY_LENGTH; size++) {
+
+				newOrgPtr->orgTotalShirts[colors][size] = 0;
+
+
+			}//size
+		}//color
+		newOrgPtr->nextPtr = NULL;
+
+
+		//put newOrgNode at end of list
+		//pointers to keep track of were in list we are
+		OrgNode* currentPtr = *headPtr;
+		OrgNode* previousPtr = NULL;
+		
+		while (currentPtr != NULL) {
+
+			//go to next Pointer until null is found
+			previousPtr = currentPtr;
+			currentPtr = currentPtr->nextPtr;
+
+		}// current != null
+
+
+		//if no head exists, make node the head
+		if (previousPtr == NULL) {
+			*headPtr = currentPtr;
+		}//make head
+
+
+		//found end of list, so add orgNode to end of list
+		else {
+			previousPtr->nextPtr = currentPtr;
+		}//add orgNode to end of List
+		
+
+
+	}// != NULL
+
+	else {
+		printf("No memory to create OrgNode for %s\n", orgName);
+	}
+	
+}//addOrgNode
+
+OrgNode* getOrgNode(OrgNode** headPtr, const char* orgName) {
+
+	//used for finding and returning a node
+	bool found = false;
+	OrgNode* returnNode = NULL;
+	OrgNode* currentNode = *headPtr;
+
+
+
+	while (!found) {
+		if (strcmp(currentNode->orgName, orgName) == 0) {
+
+			returnNode = currentNode;
+			found = true;
+
+		}//if
+	}//!found
+
+
+
+	return returnNode;
+}//getOrgNode
 
 
 
