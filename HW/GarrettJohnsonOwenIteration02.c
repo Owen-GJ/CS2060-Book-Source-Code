@@ -16,11 +16,11 @@ const char* SHIRT_SIZE_ARRAY[SIZE_ARRAY_LENGTH] = { "(s)mall", "(m)edium", "(l)a
 enum sizes { SMALL, MEDIUM, LARGE, EXTRA_LARGE };
 const char* SHIRT_COLOR_ARRAY[COLOR_ARRAY_LENGTH] = { "(w)hite", "(b)lue", "(r)ed", "(p)ink", "(k)black" };
 enum colors {WHITE, BLUE, RED, PINK, BLACK};
-#define MIN 10
-#define MAX 100
-#define NUMBER_OF_ATTEMPTS 3
-#define MIN_DONATE_PERCENT 5
-#define MAX_DONATE_PERCENT 30
+#define PRICE_MIN 40
+#define PRICE_MAX 100
+#define NUMBER_OF_ATTEMPTS 4
+#define MIN_DONATE_PERCENT 10
+#define MAX_DONATE_PERCENT 25
 
 void displayRecipt(const char* colorArray[], const char* sizeArray[], const int customerArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH],
 	double price, const char* org, double percent, int charityArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH], bool yOrNo);
@@ -43,6 +43,17 @@ void setName(char orgName[]);
 bool customerPurchase(double price, double percent, const char orgName[], int totalShirtArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH]);
 void checkout(double price, double percent, const char orgName[], int customerShirtArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH],
 	int charityArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH]);
+
+//stuct that holds information about a fundraiser organization
+typedef struct orgNode {
+
+	char orgName[ARRAY_LENGTH];
+	double price;
+	double percent;
+	int orgTotalShirts[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH];
+	struct orgNode* next;
+
+}orgNode;
 
 
 int main(void) {
@@ -398,7 +409,7 @@ double setPrice(int min, int max) {
 	//getting price and validating it
 	//setup
 	char userPrice[ARRAY_LENGTH];
-	printf("Enter sales price of t-shirts between %d and %d\n", MIN, MAX);
+	printf("Enter sales price of t-shirts between %d and %d\n", PRICE_MIN, PRICE_MAX);
 	getString(userPrice);
 
 	double valPrice = 0;
@@ -408,8 +419,8 @@ double setPrice(int min, int max) {
 	bool correctRange = false;
 	do {
 		//validating
-		while (!getValidDouble(userPrice, valPricePtr, MIN, MAX)) {
-			printf("Enter a value between %d and %d\n", MIN, MAX);
+		while (!getValidDouble(userPrice, valPricePtr, PRICE_MIN, PRICE_MAX)) {
+			printf("Enter a value between %d and %d\n", PRICE_MIN, PRICE_MAX);
 			getString(userPrice);
 		}
 
@@ -421,7 +432,7 @@ double setPrice(int min, int max) {
 		}
 
 		else if (!yOrNo) {
-			printf("Enter a value between %d and %d\n", MIN, MAX);
+			printf("Enter a value between %d and %d\n", PRICE_MIN, PRICE_MAX);
 			getString(userPrice);
 		}
 
@@ -491,7 +502,7 @@ void setup(double* price, double* percent, char orgName[]) {
 	setName(orgName);
 
 	//setup price
-	*price = setPrice(MIN, MAX);
+	*price = setPrice(PRICE_MIN, PRICE_MAX);
 
 
 	*percent = setPercent(MIN_DONATE_PERCENT, MAX_DONATE_PERCENT, orgName);
