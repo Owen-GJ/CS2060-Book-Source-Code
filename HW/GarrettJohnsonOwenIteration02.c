@@ -11,11 +11,11 @@
 #define CORRECT_PASSCODE "b"
 #define ADMIN_QUIT 'q'
 #define SIZE_ARRAY_LENGTH 4
-#define COLOR_ARRAY_LENGTH 4
+#define COLOR_ARRAY_LENGTH 5
 const char* SHIRT_SIZE_ARRAY[SIZE_ARRAY_LENGTH] = { "(s)mall", "(m)edium", "(l)arge", "(x)tra-large" };
 enum sizes { SMALL, MEDIUM, LARGE, EXTRA_LARGE };
-const char* SHIRT_COLOR_ARRAY[SIZE_ARRAY_LENGTH] = { "(w)hite", "(b)lue", "(p)ink", "(k)black" };
-enum colors {WHITE, BLUE, PINK, BLACK};
+const char* SHIRT_COLOR_ARRAY[COLOR_ARRAY_LENGTH] = { "(w)hite", "(b)lue", "(r)ed", "(p)ink", "(k)black" };
+enum colors {WHITE, BLUE, RED, PINK, BLACK};
 #define MIN 10
 #define MAX 100
 #define NUMBER_OF_ATTEMPTS 3
@@ -33,7 +33,7 @@ int valSize(char sizeSelect, const char* array[]);
 int valColor(char colorSelect, const char* array[]);
 bool valString(char* inputStringPtr);
 bool yesNoVal();
-void revisedFund();
+void fundraiser();
 int customerSize();
 int customerColor();
 void setup(double* price, double* percent,char orgName[]);
@@ -58,7 +58,7 @@ int main(void) {
 		bool correctPasscode = valString(inPasscode);
 
 		if (correctPasscode) {
-			revisedFund();
+			fundraiser();
 
 			attempt = NUMBER_OF_ATTEMPTS;
 		}//if true
@@ -674,7 +674,7 @@ bool customerPurchase(double price, double percent, const char orgName[], int to
 }
 
 
-void revisedFund() {
+void fundraiser() {
 
 	//setup will need to change a few variables and keep in scope of fundraiser
 
