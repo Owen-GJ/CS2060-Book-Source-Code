@@ -59,7 +59,7 @@ void setName(char orgName[]);
 bool customerPurchase(OrgNode** headPtr);
 void checkout(double price, double percent, const char orgName[], int customerShirtArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH],
 	int charityArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH]);
-void addOrgNode(OrgNode** headPtr, const char orgName[], double price, double percent);
+void addOrgNode(OrgNode** headPtr, const char* orgName, double price, double percent);
 OrgNode* getOrgNode(OrgNode** headPtr, const char* orgName);
 void writeSummariesToFiles(OrgNode** headPtr, const char* colorArray[], const char* sizeArray[]);
 void displayOrganizations(OrgNode** headPtr);
@@ -123,16 +123,33 @@ void addOrgNode(OrgNode** headPtr, const char* orgName, double price, double per
 		newOrgPtr->nextPtr = NULL;
 
 
-		//put newOrgNode at end of list
 		//pointers to keep track of were in list we are
 		OrgNode* currentPtr = *headPtr;
 		OrgNode* previousPtr = NULL;
-		
-		while (currentPtr != NULL && strcmp(tolower(orgName), tolower(currentPtr->orgName)) >= 0) {
 
-			//go to next Pointer until null is found
-			previousPtr = currentPtr;
-			currentPtr = currentPtr->nextPtr;
+		bool found = false;
+		//nodes still exist
+		while (currentPtr != NULL && !found ) {
+
+			//to sort alphabetically, need to create lowercase string equivilants to compare
+			char lowerOrgName[ARRAY_LENGTH] = { '\0' };
+			char lowerCurrentPtrOrgName[ARRAY_LENGTH] = { '\0' };
+
+			for (size_t i = 0; i < ARRAY_LENGTH; i++) {
+				lowerOrgName[i] = tolower(orgName[i]);
+				lowerCurrentPtrOrgName[i] = tolower(currentPtr->orgName[i]);
+			}
+
+			//current node is greater than the node to add
+			if (strcmp(lowerOrgName, lowerCurrentPtrOrgName) <= 0) {
+
+				found = true;
+			}
+
+			else {
+				previousPtr = currentPtr;
+				currentPtr = currentPtr->nextPtr;
+			}
 
 		}// current != null
 
@@ -174,7 +191,8 @@ OrgNode* getOrgNode(OrgNode** headPtr, const char* orgName) {
 	}
 
 	else {
-		while (!found) {
+		while (!found && currentNode != NULL) {
+			
 			if (strcmp(currentNode->orgName, orgName) == 0) {
 
 				returnNode = currentNode;
@@ -186,7 +204,7 @@ OrgNode* getOrgNode(OrgNode** headPtr, const char* orgName) {
 				currentNode = currentNode->nextPtr;
 			}
 
-		}//!found
+		}//!found %% currentNode != NULL
 	}//else
 
 
@@ -284,7 +302,7 @@ void displayOrganizations(OrgNode** headPtr) {
 
 	//displays each node's name
 	while (currentNode != NULL) {
-		printf("%s\n", currentNode->orgName);
+		printf("%s\tPrice: %.2lf\t Percent to charity: %%%.2lf\n", currentNode->orgName, currentNode->price, currentNode->percent);
 		currentNode = currentNode->nextPtr;
 	}
 
@@ -720,9 +738,9 @@ void setup(OrgNode** headPtr) {
 	}//while addAnother
 
 	//display all organizations created
-	puts("You have added the following organizations:");
+	puts("\nYou have added the following organizations:");
 	displayOrganizations(headPtr);
-
+	puts("\n");
 
 
 }//setup
@@ -849,14 +867,33 @@ bool customerPurchase(OrgNode** headPtr) {
 		//local shirt array for recipt purposes and total shirt book keeping. It is recreated for every customer.
 		int customerShirtArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH] = { 0 };
 			
-		//ask customer which organizations they want to purchase from, then set it as a variable to use
-		puts("Please enter the name of the organization you would like to purchase from from the list below:");
-		displayOrganizations(headPtr);
+		
+		OrgNode* fundChoice = NULL;
+		bool validChoice = false;
+		while (!validChoice) {
+			
+			//ask customer which organizations they want to purchase from, then set it as a variable to use
+			
+			puts("Please enter the name of the organization you would like to purchase from from the list below:");
+			displayOrganizations(headPtr);
+			puts("");
+			char userOrgChoice[ARRAY_LENGTH] = { '\0' };
+			getString(userOrgChoice);
+			puts("");
 
-		char userOrgChoice[ARRAY_LENGTH] = { '\0' };
-		getString(userOrgChoice);
+			fundChoice = getOrgNode(headPtr, userOrgChoice);
 
-		OrgNode* fundChoice = getOrgNode(headPtr, userOrgChoice);
+			//if the choice doens't match an organization, it will try again
+			if(fundChoice == NULL) {
+				puts("You did not enter a valid organization, please try again\n");
+				false;
+			}
+			else {
+				validChoice = true;
+			}
+
+		}//while validChoice
+
 
 		bool continuePurchasing = true;
 		while (continuePurchasing) {
