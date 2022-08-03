@@ -128,7 +128,7 @@ void addOrgNode(OrgNode** headPtr, const char* orgName, double price, double per
 		OrgNode* currentPtr = *headPtr;
 		OrgNode* previousPtr = NULL;
 		
-		while (currentPtr != NULL && strcmp(orgName, currentPtr->orgName) >= 0) {
+		while (currentPtr != NULL && strcmp(tolower(orgName), tolower(currentPtr->orgName)) >= 0) {
 
 			//go to next Pointer until null is found
 			previousPtr = currentPtr;
@@ -168,17 +168,26 @@ OrgNode* getOrgNode(OrgNode** headPtr, const char* orgName) {
 	OrgNode* returnNode = NULL;
 	OrgNode* currentNode = *headPtr;
 
+	//catch if there isn't a head
+	if (currentNode == NULL) {
+		puts("There are no Organizations currently");
+	}
 
+	else {
+		while (!found) {
+			if (strcmp(currentNode->orgName, orgName) == 0) {
 
-	while (!found) {
-		if (strcmp(currentNode->orgName, orgName) == 0) {
+				returnNode = currentNode;
+				found = true;
 
-			returnNode = currentNode;
-			found = true;
+			}//if
 
-		}//if
-	}//!found
+			else {
+				currentNode = currentNode->nextPtr;
+			}
 
+		}//!found
+	}//else
 
 
 	return returnNode;
@@ -826,14 +835,6 @@ void checkout(double price, double percent, const char orgName[], int customerSh
 //allows customer to purchase from the fundraiser
 bool customerPurchase(OrgNode** headPtr) {
 
-	//ask customer which organizations they want to purchase from, then set it as a variable to use
-	puts("Please enter the name of the organization you would like to purchase from from the list below:");
-	displayOrganizations(headPtr);
-
-	char userOrgChoice[ARRAY_LENGTH] = { '\0' };
-	getString(userOrgChoice);
-
-	OrgNode* fundChoice = getOrgNode(headPtr, userOrgChoice);
 
 	//customer purchasing, need new variables for size and color indexes
 
@@ -847,9 +848,24 @@ bool customerPurchase(OrgNode** headPtr) {
 
 		//local shirt array for recipt purposes and total shirt book keeping. It is recreated for every customer.
 		int customerShirtArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH] = { 0 };
+			
+		//ask customer which organizations they want to purchase from, then set it as a variable to use
+		puts("Please enter the name of the organization you would like to purchase from from the list below:");
+		displayOrganizations(headPtr);
+
+		char userOrgChoice[ARRAY_LENGTH] = { '\0' };
+		getString(userOrgChoice);
+
+		OrgNode* fundChoice = getOrgNode(headPtr, userOrgChoice);
 
 		bool continuePurchasing = true;
 		while (continuePurchasing) {
+
+
+
+
+
+
 
 			//get size and color indexes
 			sizeSelect = customerSize();
