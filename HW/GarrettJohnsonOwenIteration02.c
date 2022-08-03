@@ -9,7 +9,7 @@
 
 
 
-const char* FILE_PATH = {"C:/Users/TheBird/Desktop/T-Shirt Iteration 02 File Directory"};
+const char* FILE_PATH = {"C:/Users/TheBird/Desktop/T-Shirt Iteration 02 File Directory/"};
 #define ARRAY_LENGTH 80
 #define CORRECT_PASSCODE "b"
 #define ADMIN_QUIT 'q'
@@ -56,12 +56,13 @@ void setup(OrgNode** headPtr);
 double setPrice(int min, int max);
 double setPercent(int min, int max, const char orgName[]);
 void setName(char orgName[]);
-bool customerPurchase(double price, double percent, const char orgName[], int totalShirtArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH]);
+bool customerPurchase(OrgNode** headPtr);
 void checkout(double price, double percent, const char orgName[], int customerShirtArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH],
 	int charityArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH]);
-void addOrgNode(OrgNode** headPtr, const char* orgName, double price, double percent);
+void addOrgNode(OrgNode** headPtr, const char orgName[], double price, double percent);
 OrgNode* getOrgNode(OrgNode** headPtr, const char* orgName);
 void writeSummariesToFiles(OrgNode** headPtr, const char* colorArray[], const char* sizeArray[]);
+void displayOrganizations(OrgNode** headPtr);
 
 
 
@@ -138,7 +139,7 @@ void addOrgNode(OrgNode** headPtr, const char* orgName, double price, double per
 
 		//if no head exists, make node the head
 		if (previousPtr == NULL) {
-			*headPtr = currentPtr;
+			*headPtr = newOrgPtr;
 		}//make head
 
 
@@ -193,10 +194,18 @@ void writeSummariesToFiles(OrgNode** headPtr, const char* colorArray[], const ch
 		//create filePtr and open/create file for writing
 		FILE* filePtr;
 
+		//set up a filepath without editing orgName
+		char filePath[ARRAY_LENGTH] = { '\0' };
+		strcpy(filePath, FILE_PATH);
+		char orgTxt[ARRAY_LENGTH] = { '\0' };
+		strcpy(orgTxt, currentNode->orgName);
+		strcat(orgTxt, ".txt");
+		strcat(filePath, orgTxt);
+
 
 		//couldn't open file
-		if ((filePtr = fopen(strcat(FILE_PATH, strcat(currentNode->orgName, ".txt")), "w")) == NULL) {
-			printf("File for %s could not be opened", currentNode->orgName);
+		if ((filePtr = fopen(filePath, "w")) == NULL) {
+			printf("File for %s could not be opened\n", currentNode->orgName);
 		}//coudn't open
 
 		//opened file succesfully
@@ -224,7 +233,7 @@ void writeSummariesToFiles(OrgNode** headPtr, const char* colorArray[], const ch
 						for (size_t i = 0; i < SIZE_ARRAY_LENGTH; i++) {
 							fprintf(filePtr, "%-9s\t", sizeArray[i]);
 						}
-						fputs("", filePtr);
+						fputs("\n", filePtr);
 					}
 
 					//prints body
@@ -236,7 +245,7 @@ void writeSummariesToFiles(OrgNode** headPtr, const char* colorArray[], const ch
 					fprintf(filePtr, "%-9d\t", currentNode->orgTotalShirts[color][size]);
 
 				}//for size
-				fputs("", filePtr);
+				fputs("\n", filePtr);
 			}//for color
 
 			fprintf(filePtr, "Total shirts sold: %d\nTotal Sales: %.2lf\nFundraiser Percentage: %%%.2lf\nTotal Funds Raised: $%.2lf",
@@ -247,14 +256,30 @@ void writeSummariesToFiles(OrgNode** headPtr, const char* colorArray[], const ch
 		}//opened file succesfully
 
 
+		next = currentNode->nextPtr;
+		free(currentNode);
+		currentNode = next;
+
 
 	}//While currentNOde != NULL
 
 
-
+	headPtr = NULL;
 
 }//writeSummariestoFiles
 
+
+void displayOrganizations(OrgNode** headPtr) {
+
+	OrgNode* currentNode = *headPtr;
+
+	//displays each node's name
+	while (currentNode != NULL) {
+		printf("%s\n", currentNode->orgName);
+		currentNode = currentNode->nextPtr;
+	}
+
+}//displayOrganizations
 
 
 //Input argument of string pointer. Writes to string with max length, then changes new line character to \0
@@ -665,7 +690,7 @@ void setup(OrgNode** headPtr) {
 	while (addAnother) {
 
 		//name
-		char* orgName[] = { '\0' };
+		char orgName[ARRAY_LENGTH] = { '\0' };
 
 		setName(orgName);
 
@@ -675,7 +700,7 @@ void setup(OrgNode** headPtr) {
 
 		double percent = setPercent(MIN_DONATE_PERCENT, MAX_DONATE_PERCENT, orgName);
 
-		addOrgNode(&headPtr, orgName, price, percent);
+		addOrgNode(headPtr, orgName, price, percent);
 
 
 		puts("Would you like to add another organization? Enter Y/y for yes; N/n for no.");
@@ -683,8 +708,13 @@ void setup(OrgNode** headPtr) {
 			addAnother = false;
 		}// y/n val
 
-
 	}//while addAnother
+
+	//display all organizations created
+	puts("You have added the following organizations:");
+	displayOrganizations(headPtr);
+
+
 
 }//setup
 
@@ -794,8 +824,18 @@ void checkout(double price, double percent, const char orgName[], int customerSh
 
 
 //allows customer to purchase from the fundraiser
-bool customerPurchase(double price, double percent, const char orgName[], int totalShirtArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH]) {
-	//customer purchasing, need new pointers for size and color indexes
+bool customerPurchase(OrgNode** headPtr) {
+
+	//ask customer which organizations they want to purchase from, then set it as a variable to use
+	puts("Please enter the name of the organization you would like to purchase from from the list below:");
+	displayOrganizations(headPtr);
+
+	char userOrgChoice[ARRAY_LENGTH] = { '\0' };
+	getString(userOrgChoice);
+
+	OrgNode* fundChoice = getOrgNode(headPtr, userOrgChoice);
+
+	//customer purchasing, need new variables for size and color indexes
 
 	int sizeSelect = 0;
 	int colorSelect = 0;
@@ -839,11 +879,9 @@ bool customerPurchase(double price, double percent, const char orgName[], int to
 					continuePurchasing = false;
 					puts("\n");
 
-					checkout(price, percent, orgName, customerShirtArray, totalShirtArray);
+					checkout(fundChoice->price, fundChoice->percent, fundChoice->orgName, customerShirtArray, fundChoice->orgTotalShirts);
 
-				}
-
-
+				}//if(!yOrNo)
 
 
 
@@ -871,18 +909,13 @@ void fundraiser() {
 
 	setup(&headPtr);
 
-	//display all fundraiser info
-	//printf("Purchase a t-shirt for $%.2lf and %%%.2lf will be donated to %s.\n\n\n", price, percent, orgName);
 
-
-	//need 2D array to keep track of all shirt sales
-	int totalShirtArray[COLOR_ARRAY_LENGTH][SIZE_ARRAY_LENGTH] = { 0 };
 
 
 	//sentinel for if admin shutdown
 	bool shutdown = false;
 	while (!shutdown) {
-		while(customerPurchase(price, percent, orgName, totalShirtArray));
+		while (customerPurchase(&headPtr));
 		
 
 		//attempt to go into admin shutdown
@@ -899,7 +932,7 @@ void fundraiser() {
 
 			if (correctPasscode) {
 
-				displaySummary(orgName, price, percent, SHIRT_COLOR_ARRAY, SHIRT_SIZE_ARRAY, totalShirtArray);
+				writeSummariesToFiles(&headPtr, SHIRT_COLOR_ARRAY, SHIRT_SIZE_ARRAY);
 				shutdown = true;
 				attempt = NUMBER_OF_ATTEMPTS;
 			}//if true
